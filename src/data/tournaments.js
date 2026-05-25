@@ -1,5 +1,22 @@
 const tournaments = [
-  {
+  { 
+    id: 'et-121212',
+    title: 'test ',
+    game: 'FIFA ',
+    status: 'live',
+    isLiveStart: true,
+    dateTime: 'May 8, 2026 - 19:30 EAT',
+    prizePool: 'ETB 420,000',
+    viewers: '128K',
+    description: 'Season playoffs begin with a stacked group stage',
+    featured: true,
+     streamEmbedUrl: 'https://player.mux.com/llU1XMqO300zZCP1dv027M6w4oJZbwKWQqt4OtqeWiFC8',
+    thumbnail:
+      'https://res.cloudinary.com/dinjxuxno/image/upload/v1778502808/IMAGE_2026-05-11_15_33_22_rd6dbs.jpg',
+    matchDetails: 'Upper Bracket Final - Best of 5',
+    teams: ['Nile Reapers', 'Addis Phoenix'],
+  },/* 
+  { 
     id: 'et-101',
     title: 'FIFA PlayStation Elite Tournament',
     game: 'FIFA ',
@@ -9,12 +26,13 @@ const tournaments = [
     viewers: '128K',
     description: 'Season playoffs begin with a stacked group stage',
     featured: true,
-     streamEmbedUrl: 'https://www.youtube.com/embed/4xDzrJKXOOY',
+     streamEmbedUrl: 'srt://live.cloudflare.com:778?passphrase=74869957466fd70a729d9389d521ccf1k1abcbb4a0404a614751e0ac440ec60b3&streamid=play1abcbb4a0404a614751e0ac440ec60b3',
     thumbnail:
       'https://res.cloudinary.com/dinjxuxno/image/upload/v1778502808/IMAGE_2026-05-11_15_33_22_rd6dbs.jpg',
     matchDetails: 'Upper Bracket Final - Best of 5',
     teams: ['Nile Reapers', 'Addis Phoenix'],
   },
+  
   {
     id: 'et-102',
     title: 'Blue Nile Clash Series',
@@ -89,7 +107,7 @@ const tournaments = [
     streamEmbedUrl: 'https://www.youtube.com/embed/M7lc1UVf-VE',
     matchDetails: 'Final - Best of 7',
     teams: ['Orbit Pulse', 'Velocity 3'],
-  },
+  }, */
 ]
 
 export const STATUS_TABS = ['ALL', 'LIVE', 'COMPLETED', 'UPCOMING']

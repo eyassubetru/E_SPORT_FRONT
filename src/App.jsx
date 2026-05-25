@@ -1,67 +1,63 @@
-import { Route, Routes } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 
+import RegisterForm from "./components/RegisterForm";
+import LoginForm from "./components/LoginForm";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Tournaments from "./pages/Tournaments";
 import TournamentDetail from "./pages/TournamentDetail";
-import RegisterForm from "./components/RegisterForm";
-import ProtectedRoute from "./components/ProtectedRoute";
-import LoginForm from "./components/LoginForm";
 import UserProfilePage from "./pages/UserProfilePage";
-import Header from "./components/Header";
 import PaymentPage from "./pages/PaymentPage";
-function App() {
-  return (
-    <Routes>
-      {/* Public Routes */}
-      <Route path="/" element={<RegisterForm />} />
-      <Route path="/login" element={<LoginForm />} />
 
-      {/* Protected Routes */}
-      <Route element={<ProtectedRoute />}>
-        <Route
-          path="/tournament"
-          element={
+
+
+const  App = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+
+        <Route path="/" element={
+          <>
+            <RegisterForm />
+          </>
+        } />
+
+        <Route path="/login" element={
+          <>
+            <LoginForm />
+          </>
+        } />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/tournament" element={
             <>
-              <Header />
               <Tournaments />
             </>
-          }
-        />
+          } />
 
-        <Route
-          path="/tournament/:id"
-          element={
+          <Route path="/tournament/:id" element={
             <>
-              <Header />
               <TournamentDetail />
             </>
-          }
-        />
+          } />
 
-        <Route
-          path="/profile"
-          element={
+          <Route path="/profile" element={
             <>
-              <Header />
               <UserProfilePage />
             </>
-          }
-        />
+          } />
 
-         <Route
-          path="/payment"
-          element={
+          <Route path="/payment" element={
             <>
-              <Header />
               <PaymentPage />
             </>
-          }
-        />
-      </Route>
+          } />
+        </Route>
 
-      
-
-    
-    </Routes>
+      </Routes>
+    </AnimatePresence>
   );
 }
 

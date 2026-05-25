@@ -1,36 +1,39 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import tournaments, { STATUS_TABS } from '../data/tournaments'
+import /* tournaments, */ { STATUS_TABS } from '../data/tournaments'
 import TournamentCard from '../components/TournamentCard'
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth , db } from '../config/firebaseConfig'
-import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from '../config/firebaseConfig'
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 import axios from 'axios';
 import { FaUser, FaSignOutAlt } from "react-icons/fa";
+import LoadingScreen from '../components/LoadingScreen';
 
 const Tournaments = () => {
-  const [activeTab, setActiveTab] = useState('ALL')
+  const [activeTab, setActiveTab] = useState('ALL');
+  const [tournaments, setTournaments] = useState([]);
   const [showBottomNav, setShowBottomNav] = useState(false)
   const tabsRef = useRef(null)
-  const featuredTournament = tournaments.find((item) => item.featured) ?? tournaments[0]
-    const [showFirst, setShowFirst] = useState(true);
+  const [featuredTournament, setFeaturedTournament] = useState(null);
+  const [showFirst, setShowFirst] = useState(true);
   const [userData, setUserData] = useState(null);
-  const { user, loading} = useAuth();
- const apiUrl = import.meta.env.VITE_API_URL;
+  const { user, loading } = useAuth();
+  const [isLoading , setIsLoading] = useState(false);
+  const apiUrl = import.meta.env.VITE_API_URL;
 
 
 
   const filteredTournaments = useMemo(() => {
     if (activeTab === 'ALL') return tournaments
     return tournaments.filter((item) => item.status.toUpperCase() === activeTab)
-  }, [activeTab])
+  }, [activeTab,tournaments])
 
 
   const handleLogout = async (e) => {
     try {
-      axios.post(`${apiUrl}/signout `,{
-    withCredentials: true,
-  } )
+      axios.post(`${apiUrl}/signout `, {
+        withCredentials: true,
+      })
       await signOut(auth);
     } catch (error) {
       console.log(error)
@@ -48,7 +51,7 @@ const Tournaments = () => {
     }
 
     return null;
-};
+  };
 
   useEffect(() => {
     const tabsElement = tabsRef.current
@@ -75,20 +78,63 @@ const Tournaments = () => {
     return () => clearInterval(interval);
   }, []);
 
-    useEffect(()=>{
-      console.log(user)
-    },[user])
+  useEffect(() => {
+    console.log(user)
+  }, [user])
+
+  useEffect(() => {
+    const fetchTournaments = async () => {
+      setIsLoading(true);
+      try {
+        const querySnapShot = await getDocs(collection(db, "tournaments"));
+        console.log(querySnapShot.docs);
+       const tournamentsList =  querySnapShot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      setTournaments(tournamentsList);
+      const featured = tournamentsList.find((item) => item.featured) ?? tournamentsList[0]
+      setFeaturedTournament(featured);
+
+      console.log(tournamentsList);
+      setIsLoading(false)
+      } catch (error) {
+        console.log(error)
+      }
+     
+    }
+     fetchTournaments();
+  }, [loading])
 
 
   return (
     <main className="min-h-screen bg-[#060b18] pb-28 text-white ">
 
       <section className="pt-5 sm:pt-6 mt-8">
-        <div className="relative overflow-hidden">
+        {
+          isLoading 
+          ? 
+         <div className="flex  items-center justify-center bg-[#060b18] h-100">
+      <div className="flex flex-col items-center gap-4">
+        
+        {/* Spinner */}
+        <div className="relative h-14 w-14 sm:h-16 sm:w-16">
+          <div className="absolute inset-0 animate-spin rounded-full border-4 border-[#152345] border-t-[#f6e925]" />
+        </div>
+
+        {/* Text */}
+        <p className="text-xs font-semibold tracking-widest text-slate-300 sm:text-sm">
+          Loading tournaments...
+        </p>
+      </div>
+    </div>
+          : 
+           <div className="relative overflow-hidden">
           <div className="relative w-full aspect-video overflow-hidden">
             <img
-              src={featuredTournament.thumbnail}
-              alt={featuredTournament.title}
+              src={featuredTournament?.thumbnail}
+              alt={featuredTournament?.title}
               className="w-full h-full object-cover"
             />
           </div>
@@ -96,34 +142,36 @@ const Tournaments = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
 
           <div className="absolute inset-x-0 bottom-0 p-4 sm:p-10 lg:p-16">
-            {/* Label: Slightly smaller on mobile to keep it on one line */}
+           
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#f6e925] sm:text-xs">
               Featured Tournament
             </p>
 
-            {/* Title: Using text-2xl for mobile and 6xl for very large screens */}
+            
             <h1 className="mt-1 max-w-4xl text-2xl font-black leading-[1.1] text-white sm:text-4xl md:text-5xl lg:text-6xl">
-              {featuredTournament.title}
+              {featuredTournament?.title}
             </h1>
 
             {/* Description: Hidden or clamped on very small screens to prevent overlap, full view on desktop */}
             <p className="mt-2 max-w-2xl line-clamp-2 text-xs leading-relaxed text-slate-200 sm:line-clamp-none sm:text-base md:text-lg">
-              {featuredTournament.description}
+              {featuredTournament?.description}
             </p>
 
-            {/* Button: Responsive padding */}
+         
             <a
-              href={loading ?'' : `#${featuredTournament.id}`}
-              onClick={()=>{setActiveTab('ALL')}}
+              href={`#${featuredTournament?.id}`}
+              onClick={() => { setActiveTab('ALL') }}
               className="mt-4 inline-flex items-center rounded-md bg-[#f6e925] px-4 py-2 text-xs font-extrabold text-[#0c1227] transition-all hover:scale-105 hover:bg-[#fff34f] sm:px-6 sm:py-3 sm:text-sm"
             >
               {
-                loading ? 'Loading....' : ' Watch Now'
+                ' Watch Now'
               }
-             
+
             </a>
           </div>
         </div>
+        }
+       
       </section>
 
       <section ref={tabsRef} className="mx-auto max-w-6xl px-4 pb-6 sm:px-6">
@@ -145,13 +193,14 @@ const Tournaments = () => {
 
       <section className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid gap-4 transition-all duration-300 sm:grid-cols-2 lg:grid-cols-3">
+          
           {filteredTournaments.map((tournament) => (
             <div
               key={tournament.id}
               id={tournament.id}
               className="animate-[fadeIn_250ms_ease-out]"
             >
-              <TournamentCard tournament={tournament }  />
+              <TournamentCard tournament={tournament} />
             </div>
           ))}
         </div>

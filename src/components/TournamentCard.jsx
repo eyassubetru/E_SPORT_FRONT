@@ -52,11 +52,11 @@ const TournamentCard = ({ tournament }) => {
         </div>
 
         <Link
-          to={loading ? '' : isPay ?  `/tournament/${tournament.id}` : "/payment"}
+          to={ `/tournament/${tournament.id}` }
           className="block rounded-md bg-[#268dff] px-4 py-3 text-center text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-[#4da2ff]"
         >
           {
-            loading ? "Loading ..." : 'Watch'
+          'Watch'
           }
           
         </Link>

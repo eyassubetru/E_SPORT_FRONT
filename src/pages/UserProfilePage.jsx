@@ -5,7 +5,7 @@ const UserProfilePage = () => {
   const user = {
     phone: "+251912345678",
     membership: "Free", // change to "Premium" or "Free"
-    balance: 2450,
+    balance: "  ---",
     avatar:
       "https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff",
   };
@@ -20,7 +20,7 @@ const UserProfilePage = () => {
         <div className="overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#101935] to-[#091224] shadow-2xl">
 
           {/* Top Banner */}
-          <div className="relative h-32 bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20" />
+          <div className="relative h-32 bg-linear-to from-cyan-500/20 via-blue-500/20 to-purple-500/20" />
 
           {/* Content */}
           <div className="relative px-6 pb-8">
