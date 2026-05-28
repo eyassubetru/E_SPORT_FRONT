@@ -1,16 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
+import LoadingScreen from '../components/LoadingScreen'
 import { FaCrown, FaWallet, FaPhoneAlt } from "react-icons/fa";
-
+import useAuth from "../hooks/useAuth";
 const UserProfilePage = () => {
-  const user = {
-    phone: "+251912345678",
-    membership: "Free", // change to "Premium" or "Free"
-    balance: "  ---",
-    avatar:
-      "https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff",
-  };
+  const { user, loading } = useAuth();
+  useEffect(()=>{
+    console.log(user)
+  },[loading , user])
+  
 
-  const isPremium = user.membership.toLowerCase() === "premium";
+
+  //const isPremium = user.membership?.toLowerCase() === "premium";
+
+  if(loading){
+    return <LoadingScreen />
+  }
 
   return (
     <div className="min-h-screen bg-[#050816] px-4 py-24 text-white">
@@ -31,7 +35,7 @@ const UserProfilePage = () => {
               <div className="flex flex-col items-center sm:flex-row sm:items-end sm:gap-5">
 
                 <img
-                  src={user.avatar}
+                  src="https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff"
                   alt="profile"
                   className="h-28 w-28 rounded-2xl border-4 border-[#091224] object-cover shadow-xl"
                 />
@@ -41,25 +45,25 @@ const UserProfilePage = () => {
                   {/* Phone */}
                   <p className="flex items-center justify-center gap-2 text-sm text-slate-400 sm:justify-start">
                     <FaPhoneAlt className="text-xs" />
-                    {user.phone}
+                    {user.phoneNumber}
                   </p>
 
                   {/* Membership */}
                   <div className="mt-3 flex justify-center sm:justify-start">
                     <span
                       className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${
-                        isPremium
+                        false
                           ? "bg-yellow-500/10 text-yellow-400"
                           : "bg-red-500/10 text-red-400"
                       }`}
                     >
                       <FaCrown />
-                      {user.membership} Member
+                       Member
                     </span>
                   </div>
 
                   {/* Upgrade Button */}
-                  {!isPremium && (
+                  {!true && (
                     <button
                       onClick={() => (window.location.href = "/payment")}
                       className="mt-3 rounded-xl bg-yellow-500 px-4 py-2 text-sm font-bold text-black transition hover:bg-yellow-400"
@@ -71,7 +75,7 @@ const UserProfilePage = () => {
               </div>
 
               {/* Balance */}
-              <div className="mt-6 sm:mt-0 rounded-2xl border border-green-500/20 bg-green-500/10 p-4">
+             {/*  <div className="mt-6 sm:mt-0 rounded-2xl border border-green-500/20 bg-green-500/10 p-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-500/20 text-green-400">
                     <FaWallet />
@@ -82,11 +86,11 @@ const UserProfilePage = () => {
                       Balance
                     </p>
                     <h2 className="text-xl font-black text-green-400">
-                      ETB {user.balance}
+                      ETB // {user.balance} 
                     </h2>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
             </div>
 
