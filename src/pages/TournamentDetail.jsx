@@ -109,7 +109,7 @@ const TournamentDetail = () => {
         <section className="grid gap-4 lg:grid-cols-[1.8fr_1fr]">
           <div className="overflow-hidden rounded-md border border-[#2d3d63] bg-black">
             {
-              tournament.status === 'upcoming' || tournament.status === 'live' && !tournament.isLiveStart ?
+              tournament.status === 'Upcoming' || tournament.status === 'live' && !tournament.isLiveStart ?
                 <div className="relative h-[230px] w-full sm:h-[360px] overflow-hidden rounded-xl bg-black group">
 
                   {/* Background Image */}
@@ -149,28 +149,12 @@ const TournamentDetail = () => {
             <p className="text-sm text-slate-300">{tournament.description}</p>
             <div className="space-y-1 text-sm text-slate-300">
               <p>Game: {tournament.game}</p>
-              <p>Schedule: {tournament.dateTime}</p>
+               <span>
+  {tournament.dateTime ? new Date(tournament.dateTime?.seconds * 1000).toLocaleString() : ""}
+</span>
               <p>Prize Pool: {tournament.prizePool}</p>
             </div>
           </aside>
-        </section>
-
-        <section>
-          <div className="rounded-md border border-[#2d3d63] bg-[#0c142b] p-4">
-            <h2 className="mb-2 text-lg font-bold text-[#f6e925]">Match Details</h2>
-            <p className="text-sm text-slate-300">{tournament.matchDetails}</p>
-            <h3 className="mb-2 mt-4 text-base font-bold text-[#8bc2ff]">Teams / Players</h3>
-            <div className="flex flex-wrap gap-2">
-            {/*   {tournament.teams.map((team) => (
-                <span
-                  key={team}
-                  className="rounded-sm border border-[#268dff]/40 bg-[#268dff]/10 px-3 py-1 text-xs text-[#9dcdff]"
-                >
-                  {team}
-                </span>
-              ))} */}
-            </div>
-          </div>
         </section>
       </div>
     </main>

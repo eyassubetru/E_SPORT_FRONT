@@ -43,7 +43,9 @@ const TournamentCard = ({ tournament }) => {
         <div className="grid grid-cols-2 gap-2 text-xs text-slate-300">
           <div className="flex items-center gap-1.5">
             <Calendar size={14} className="text-[#8bc2ff]" />
-            <span>{tournament.dateTime}</span>
+           <span>
+  {tournament.dateTime ? new Date(tournament.dateTime?.seconds * 1000).toLocaleString() : ""}
+</span>
           </div>
           <div className="flex items-center gap-1.5">
             <Trophy size={14} className="text-[#f6e925]" />
