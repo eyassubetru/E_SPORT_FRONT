@@ -4,6 +4,7 @@ import tournaments from '../data/tournaments'
 import { useEffect, useState } from 'react'
 import { doc, getDoc, getDocs } from 'firebase/firestore'
 import { db } from '../config/firebaseConfig'
+import axios from 'axios'
 
 
 
@@ -13,6 +14,32 @@ const TournamentDetail = () => {
   const [isLoading, setIsLoading] = useState(false);
 
 
+/* useEffect(() => {
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const device_id = localStorage.getItem("device_id");
+  
+  try {
+    const interval = setInterval(async () => {
+
+    const res = await axios.post(`${apiUrl}/getMuxStreamUrl`, {
+      productId: id
+    } ,{headers:{
+       device_id
+    }},{
+    withCredentials: true,
+  }
+    
+  )
+  console.log("video link",res.data)
+  }, 20000);
+  } catch (error) {
+    console.log("getLink error:", error)
+  }
+
+  
+
+  return () => clearInterval(interval);
+}, []); */
 
 
 
@@ -109,7 +136,8 @@ const TournamentDetail = () => {
         <section className="grid gap-4 lg:grid-cols-[1.8fr_1fr]">
           <div className="overflow-hidden rounded-md border border-[#2d3d63] bg-black">
             {
-              tournament.status === 'Upcoming' || tournament.status === 'live' && !tournament.isLiveStart ?
+              
+              tournament.status === 'Upcoming' || tournament.status === 'Live' && !tournament.isLiveStart ?
                 <div className="relative h-[230px] w-full sm:h-[360px] overflow-hidden rounded-xl bg-black group">
 
                   {/* Background Image */}

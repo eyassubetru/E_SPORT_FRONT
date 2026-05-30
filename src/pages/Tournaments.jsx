@@ -143,12 +143,12 @@ const Tournaments = () => {
 
           <div className="absolute inset-x-0 bottom-0 p-4 sm:p-10 lg:p-16">
            
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#f6e925] sm:text-xs">
-              Featured Tournament
+            <p className="md:text-[10px] text-[8px] font-bold uppercase tracking-[0.2em] text-[#f6e925] sm:text-xs">
+              Featured Event
             </p>
 
             
-            <h1 className="mt-1 max-w-4xl text-2xl font-black leading-[1.1] text-white sm:text-4xl md:text-5xl lg:text-6xl">
+            <h1 className="mt-1 max-w-4xl  md:text-2xl font-black leading-[1.1] text-white sm:text-4xl md:text-5xl lg:text-6xl">
               {featuredTournament?.title}
             </h1>
 
@@ -161,7 +161,7 @@ const Tournaments = () => {
             <a
               href={`#${featuredTournament?.id}`}
               onClick={() => { setActiveTab('ALL') }}
-              className="mt-4 inline-flex items-center rounded-md bg-[#f6e925] px-4 py-2 text-xs font-extrabold text-[#0c1227] transition-all hover:scale-105 hover:bg-[#fff34f] sm:px-6 sm:py-3 sm:text-sm"
+              className="mt-1 md:mt-4 inline-flex items-center rounded-md bg-[#f6e925] py-1 px-2 md:px-4 md:py-2 text-xs font-extrabold text-[#0c1227] transition-all hover:scale-105 hover:bg-[#fff34f] sm:px-6 sm:py-3 sm:text-sm"
             >
               {
                 ' Watch Now'

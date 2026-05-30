@@ -16,7 +16,8 @@ import { initializeApp } from "firebase/app";
 import { signInWithCustomToken, onAuthStateChanged } from "firebase/auth";
 
 import { useNavigate } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
+import { useAuth } from '../context/AuthContext';
+
 
 
 const RegisterForm = () => {
@@ -246,7 +247,7 @@ const RegisterForm = () => {
                 <div className="relative h-36 sm:h-44 overflow-hidden bg-gray-200">
                     <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-black/10 z-10" />
                     <img
-                        src="/hero-image.jpg"
+                        src="/new-image-hero.png"
                         alt="Tournament Banner"
                         className="w-full h-full object-cover"
                     />
@@ -258,7 +259,7 @@ const RegisterForm = () => {
                             Official <span className="text-green-600">Entry</span>
                         </h2>
                         <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">
-                            FIFA Tournament 2026
+                           Boxing And FIFA Tournament 
                         </p>
                     </div>
 

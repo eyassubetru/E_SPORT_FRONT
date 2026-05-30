@@ -7,24 +7,43 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        const userRef = doc(db, "users", firebaseUser.uid);
-        const snap = await getDoc(userRef);
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {  
+      // 1. Set loading to true whenever auth state changes
+      setLoading(true); 
+      console.log(firebaseUser, "firebaseuser")
+      
+      try {
+        if (firebaseUser) {
+          let userData = {};
+          try {
+            const userRef = doc(db, "users", firebaseUser.uid);
+            const snap = await getDoc(userRef);
+            if (snap.exists()) {
+              userData = snap.data();
+            }
+          } catch (err) {
+            console.error("Firestore fetch failed", err);
+          }
 
-
-        setUser({
-          ...firebaseUser,
-          ...snap.data(), // 👈 includes isPaid, phoneNumber, etc
-        });
-      } else {
-        setUser(null);
+          setUser({
+            uid: firebaseUser.uid,
+            phoneNumber: firebaseUser.phoneNumber,
+            accessToken: await firebaseUser.getIdToken(),
+            ...userData,
+          });
+        } else {
+          // 2. Clear user if they sign out
+          setUser(null);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        // 3. Always set loading to false after the logic finishes
+        setLoading(false);
       }
-
-      setLoading(false);
     });
 
     return () => unsubscribe();

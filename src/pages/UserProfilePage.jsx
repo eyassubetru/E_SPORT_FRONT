@@ -35,7 +35,7 @@ const UserProfilePage = () => {
               <div className="flex flex-col items-center sm:flex-row sm:items-end sm:gap-5">
 
                 <img
-                  src="https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff"
+                  src="https://ui-avatars.com/api/?name=U&background=0D8ABC&color=fff"
                   alt="profile"
                   className="h-28 w-28 rounded-2xl border-4 border-[#091224] object-cover shadow-xl"
                 />

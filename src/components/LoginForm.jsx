@@ -9,7 +9,7 @@ import { auth } from "../config/firebaseConfig";
 import { signInWithCustomToken } from "firebase/auth";
 
 import { useNavigate } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
+import  {useAuth}  from "../context/AuthContext";
 
 import { getOrCreateDeviceId } from "../utility/getOrCreateDeviceId";
 
@@ -68,12 +68,22 @@ const LoginForm = () => {
                 });
 
       if (data?.success && data?.customToken) {
-        await signInWithCustomToken(auth, data.customToken);
+        try {
+          const cred =  await signInWithCustomToken(auth, data.customToken);
+          navigate("/tournament");
+          console.log(cred, "firebase logged in ")
+        console.log(data)
 
         setResponse({
           status: "success",
           message: "Logged in successfully",
         });
+        console.log("logged in", user)
+        console.log(response.status,response.message)
+        } catch (error) {
+          console.log(error, "firebase dont logged in")
+        }
+  
       } else {
         setResponse({
           status: "error",
@@ -88,6 +98,7 @@ const LoginForm = () => {
         message:
           error.response?.data?.message || "Something went wrong",
       });
+      console.log(error)
     } finally {
       setIsLoading(false);
     }
@@ -95,9 +106,10 @@ const LoginForm = () => {
 
   useEffect(() => {
     if (user) {
+      console.log(user)
       navigate("/tournament");
     }
-  }, [user]);
+  }, [user,navigate]);
 
 
   return (
