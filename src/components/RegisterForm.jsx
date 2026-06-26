@@ -71,7 +71,7 @@ const RegisterForm = () => {
                 return
             }
             const deviceId = getOrCreateDeviceId();
-            const response = await axios.post(`${apiUrl}/signupUser`, {
+                   const response = await axios.post(`${apiUrl}/authApi/signup`, {
                 "phone": cleanNumber,
                 "newPassword": password,
                 "otpCode": OTP
@@ -103,7 +103,7 @@ const RegisterForm = () => {
         } catch (error) {
             console.log(error.response)
             setResponse({
-                status: 'error', status: 'error',
+                status: 'error',
                 message: error.response?.data?.message ||
                     error.data?.message ||
                     "Something went wrong"
@@ -133,8 +133,9 @@ const RegisterForm = () => {
 
             const deviceId = getOrCreateDeviceId()
 
-            const response = await axios.post(`${apiUrl}/sendOTP`, {
+             const response = await axios.post(`${apiUrl}/authApi/sendOtp`, {
                 "phoneNumber": cleanNumber,
+                 platform : "esport"
 
             },);
 
@@ -414,7 +415,7 @@ const RegisterForm = () => {
 
                     <div
                         className='text-center text-[13px]  text-green-800 uppercase tracking-widest ml-1'
-                        onClick={() => { navigate('/login') }}
+                        onClick={() => { navigate('/') }}
                     >
                         <p className='cursor-pointer'>already have account
                             <span className='text-green-900 underline font-bold'>Login</span>

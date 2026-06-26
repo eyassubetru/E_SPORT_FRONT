@@ -1,67 +1,73 @@
-import React, { useEffect, useState } from "react";
-import PhoneInputComponent from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
+import React, { useEffect, useState } from 'react';
+import PhoneInputComponent from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import axios from "axios";
+import axios from 'axios';
 import { isValidPhoneNumber } from "libphonenumber-js";
-import { auth } from "../config/firebaseConfig";
+import { auth } from '../config/firebaseConfig';
 import { signInWithCustomToken } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { getOrCreateDeviceId } from "../utility/getOrCreateDeviceId";
+import { useAuth } from '../context/AuthContext';
 
 const PhoneInput = PhoneInputComponent.default || PhoneInputComponent;
 
-const LoginForm = () => {
+const ForgottenPassword = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [response, setResponse] = useState({ status: '', message: '' });
   const [isLoading, setIsLoading] = useState(false);
-  const [response, setResponse] = useState({ status: "", message: "" });
+  const [isOTPLoading, setIsOTPLoading] = useState(false);
+  const [isOTPSet, setIsOTPSet] = useState(false);
+  const [isOTPSend, setIsOTPSend] = useState(false);
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [OTP, setOTP] = useState('');
+  const [countdown, setCountdown] = useState(0);
 
   const apiUrl = import.meta.env.VITE_API_URL;
 
-  const login = async (e) => {
+  function getOrCreateDeviceId() {
+    let deviceId = localStorage.getItem("device_id");
+    if (!deviceId) {
+      deviceId = crypto.randomUUID();
+      localStorage.setItem("device_id", deviceId);
+    }
+    return deviceId;
+  }
+
+  const resetPassword = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
       const cleanNumber = "+" + phoneNumber.replace(/\D/g, "");
       if (!isValidPhoneNumber(cleanNumber)) {
-        setResponse({ status: "error", message: "Invalid phone number" });
+        setResponse({ status: 'error', message: 'Invalid Phone Number' });
         return;
       }
       if (password.length < 8) {
-        setResponse({
-          status: "error",
-          message: "Password must be at least 8 characters",
-        });
+        setResponse({ status: 'error', message: 'Password must be at least 8 characters' });
         return;
       }
 
       const deviceId = getOrCreateDeviceId();
       const { data } = await axios.post(
-        `${apiUrl}/authApi/login`,
-        { phone: cleanNumber, password, platform: "esport" },
+        `${apiUrl}/authApi/resetPassword`,
+        { phone: cleanNumber, newPassword: password, otpCode: OTP },
         { headers: { "x-device-id": deviceId } }
       );
 
-      if (data?.success && data?.customToken) {
+      if (data.success && data.customToken) {
         await signInWithCustomToken(auth, data.customToken);
+        setResponse({ status: "success", message: "Password reset successfully" });
         navigate("/tournament");
-        setResponse({ status: "success", message: "Logged in successfully" });
       } else {
-        setResponse({
-          status: "error",
-          message: data?.message || "Login failed",
-        });
+        setResponse({ status: 'error', message: data.message || "Reset failed" });
       }
     } catch (error) {
       setResponse({
-        status: "error",
+        status: 'error',
         message: error.response?.data?.message || "Something went wrong",
       });
     } finally {
@@ -69,9 +75,59 @@ const LoginForm = () => {
     }
   };
 
+  const handleSendOTP = async () => {
+    if (isLoading || countdown > 0) return;
+    setIsOTPLoading(true);
+    const cleanNumber = "+" + phoneNumber.replace(/\D/g, "");
+    try {
+      if (!isValidPhoneNumber(cleanNumber)) {
+        setResponse({ status: 'error', message: 'Invalid phone number' });
+        return;
+      }
+      const deviceId = getOrCreateDeviceId();
+      const { data } = await axios.post(
+        `${apiUrl}/authApi/sendOtp`,
+        { phoneNumber: cleanNumber, signInOption: "password_reset" }
+      );
+      if (!data.success) {
+        setResponse({ status: 'error', message: data.message });
+        return;
+      }
+      setResponse({ status: 'success', message: data.message });
+      setIsOTPSend(true);
+      setCountdown(3 * 60);
+    } catch (error) {
+      setResponse({
+        status: 'error',
+        message: error.response?.data?.message || "Network error",
+      });
+      if (error.response?.data?.remainingSeconds) {
+        setCountdown(error.response.data.remainingSeconds);
+      }
+    } finally {
+      setIsOTPLoading(false);
+    }
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
   useEffect(() => {
     if (user) navigate("/tournament");
   }, [user, navigate]);
+
+  useEffect(() => {
+    if (countdown <= 0) return;
+    const timer = setInterval(() => setCountdown((prev) => prev - 1), 1000);
+    return () => clearInterval(timer);
+  }, [countdown]);
+
+  useEffect(() => {
+    setIsOTPSet(OTP.length >= 6);
+  }, [OTP]);
 
   return (
     <div className="min-h-svh flex items-center justify-center bg-[#05160f] p-4 font-sans fixed inset-0">
@@ -92,10 +148,10 @@ const LoginForm = () => {
           />
         </div>
 
-        <form onSubmit={login} className="px-6 py-6 sm:px-10 sm:pb-8 flex flex-col gap-4 sm:gap-5">
+        <form onSubmit={resetPassword} className="px-6 py-6 sm:px-10 sm:pb-8 flex flex-col gap-4 sm:gap-5">
           <div className="text-center">
             <h2 className="text-2xl sm:text-3xl font-black text-green-900 uppercase tracking-tighter italic leading-tight">
-              Official <span className="text-green-600">Login</span>
+              Reset <span className="text-green-600">Password</span>
             </h2>
             <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">
               Boxing And FIFA Tournament
@@ -140,30 +196,63 @@ const LoginForm = () => {
             />
           </div>
 
-          {/* Password */}
+          {/* OTP */}
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="password" className="text-[10px] font-black text-green-800/50 uppercase tracking-widest ml-1">
-              Password
+            <label className="text-[10px] font-black text-green-800/50 uppercase tracking-widest ml-1">
+              OTP Verification
             </label>
-            <div className="relative">
+            <div className="flex gap-2 w-full">
               <input
-                id="password"
-                type={showPassword ? "text" : "password"}
+                type="text"
                 required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                className="w-full h-[50px] px-4 bg-green-50/50 border-2 border-green-100 rounded-2xl focus:outline-none focus:border-green-600 focus:bg-white transition-all font-bold text-green-900 placeholder:text-green-200"
+                value={OTP}
+                onChange={(e) => setOTP(e.target.value)}
+                placeholder="OTP Code"
+                className="min-w-0 flex-1 h-[50px] px-4 bg-green-50/50 border-2 border-green-100 rounded-2xl focus:outline-none focus:border-green-600 focus:bg-white transition-all font-bold text-green-900 placeholder:text-green-200"
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-5 top-3 text-green-700"
-              >
-                {showPassword ? <FaEyeSlash className="text-2xl" /> : <FaEye className="text-2xl" />}
-              </button>
+              {!isOTPSend && (
+                <button
+                  type="button"
+                  disabled={isOTPLoading || countdown > 0}
+                  onClick={handleSendOTP}
+                  className={`shrink-0 min-w-fit px-3 sm:px-5 rounded-2xl transition-all uppercase tracking-widest whitespace-nowrap border-2 font-black text-[10px] sm:text-[11px] ${
+                    countdown > 0
+                      ? "bg-gray-200 border-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-green-100 hover:bg-green-200 border-green-200 text-green-700 active:scale-95"
+                  }`}
+                >
+                  {isOTPLoading ? "..." : countdown > 0 ? formatTime(countdown) : "Send OTP"}
+                </button>
+              )}
             </div>
           </div>
+
+          {/* New Password (appears after OTP set) */}
+          {isOTPSet && (
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="password" className="text-[10px] font-black text-green-800/50 uppercase tracking-widest ml-1">
+                New Password
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  className="w-full h-[50px] px-4 bg-green-50/50 border-2 border-green-100 rounded-2xl focus:outline-none focus:border-green-600 focus:bg-white transition-all font-bold text-green-900 placeholder:text-green-200"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-5 top-3 text-green-700"
+                >
+                  {showPassword ? <FaEyeSlash className="text-2xl" /> : <FaEye className="text-2xl" />}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Response Message */}
           {response.message && (
@@ -181,9 +270,9 @@ const LoginForm = () => {
           {/* Submit */}
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || OTP.length < 6}
             className={`w-full h-14 rounded-2xl font-black uppercase tracking-[0.2em] transition-all flex justify-center items-center text-sm shadow-lg ${
-              isLoading
+              isLoading || OTP.length < 6
                 ? "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
                 : "bg-green-600 text-white hover:bg-green-700 active:translate-y-1 shadow-green-900/20"
             }`}
@@ -191,23 +280,18 @@ const LoginForm = () => {
             {isLoading ? (
               <span className="flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Logging in
+                Resetting
               </span>
             ) : (
-              "Login"
+              "Reset Password"
             )}
           </button>
 
           {/* Navigation */}
           <div className="text-center text-[13px] text-green-800 uppercase tracking-widest">
-            <p className="cursor-pointer" onClick={() => navigate("/signup")}>
-              Don't have account?{" "}
-              <span className="text-green-900 underline font-bold">SignUp</span>
-            </p>
-          </div>
-          <div className="text-center text-[13px] text-green-800 uppercase tracking-widest">
-            <p className="cursor-pointer" onClick={() => navigate("/forgotten-password")}>
-              Reset Password
+            <p className="cursor-pointer" onClick={() => navigate("/")}>
+              Already have account?{" "}
+              <span className="text-green-900 underline font-bold">Login</span>
             </p>
           </div>
         </form>
@@ -235,4 +319,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default ForgottenPassword;

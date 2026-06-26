@@ -8,6 +8,7 @@ import Tournaments from "./pages/Tournaments";
 import TournamentDetail from "./pages/TournamentDetail";
 import UserProfilePage from "./pages/UserProfilePage";
 import PaymentPage from "./pages/PaymentPage";
+import ForgottenPassword from "./components/ForgottenPassword";
 
 
 
@@ -20,13 +21,18 @@ const  App = () => {
 
         <Route path="/" element={
           <>
-            <RegisterForm />
+            <LoginForm />
           </>
         } />
 
-        <Route path="/login" element={
+        <Route path="/signup" element={
           <>
-            <LoginForm />
+            < RegisterForm/>
+          </>
+        } />
+        <Route path="/forgotten-password" element={
+          <>
+            < ForgottenPassword/>
           </>
         } />
 
