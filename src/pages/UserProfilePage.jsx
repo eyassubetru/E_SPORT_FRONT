@@ -9,7 +9,6 @@ const UserProfilePage = () => {
   },[loading , user])
   
 
-
   //const isPremium = user.membership?.toLowerCase() === "premium";
 
   if(loading){

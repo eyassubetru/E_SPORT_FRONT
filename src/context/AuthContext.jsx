@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {  
       // 1. Set loading to true whenever auth state changes
       setLoading(true); 
-      console.log(firebaseUser, "firebaseuser")
+      //console.log(firebaseUser, "firebaseuser")
       
       try {
         if (firebaseUser) {

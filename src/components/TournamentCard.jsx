@@ -12,7 +12,7 @@ const badgeClassByStatus = {
 const TournamentCard = ({ tournament }) => {
   const isPay = false;
   const statusKey = tournament.status.toLowerCase()
-  const { user, loading} = useAuth();
+  const { user, loading } = useAuth();
 
   return (
     <article className="group rounded-md border border-[#2d3d63] bg-[#0c142b] p-3 shadow-xl shadow-black/20 transition-transform duration-300 hover:-translate-y-1">
@@ -41,26 +41,30 @@ const TournamentCard = ({ tournament }) => {
         <p className="text-sm leading-6 text-slate-300">{tournament.description}</p>
 
         <div className="grid grid-cols-2 gap-2 text-xs text-slate-300">
-          <div className="flex items-center gap-1.5">
-            <Calendar size={14} className="text-[#8bc2ff]" />
-           <span>
-  {tournament.dateTime ? new Date(tournament.dateTime?.seconds * 1000).toLocaleString() : ""}
-</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Trophy size={14} className="text-[#f6e925]" />
-            <span>{tournament.prizePool}</span>
-          </div>
+          {
+            tournament.dateTime && <div className="flex items-center gap-1.5">
+              <Calendar size={14} className="text-[#8bc2ff]" />
+              <span>
+                {tournament.dateTime ? new Date(tournament.dateTime?.seconds * 1000).toLocaleString() : ""}
+              </span>
+            </div>
+          }
+          {tournament.prizePool > 0 &&
+            <div className="flex items-center gap-1.5">
+              <Trophy size={14} className="text-[#f6e925]" />
+              <span>{tournament.prizePool}</span>
+            </div>
+          } 
         </div>
 
         <Link
-          to={ `/tournament/${tournament.id}` }
+          to={`/tournament/${tournament.id}`}
           className="block rounded-md bg-[#268dff] px-4 py-3 text-center text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-[#4da2ff]"
         >
           {
-          'Watch'
+            'Watch'
           }
-          
+
         </Link>
       </div>
     </article>

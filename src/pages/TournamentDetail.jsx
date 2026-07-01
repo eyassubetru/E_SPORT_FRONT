@@ -1,192 +1,179 @@
-import { ArrowLeft, Share2 } from 'lucide-react'
-import { Link, useParams } from 'react-router'
-import tournaments from '../data/tournaments'
-import { useEffect, useState } from 'react'
-import { doc, getDoc, getDocs } from 'firebase/firestore'
-import { db } from '../config/firebaseConfig'
-import axios from 'axios'
-
-
+import { ArrowLeft, ChevronDown } from "lucide-react";
+import { Link, useParams } from "react-router";
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../config/firebaseConfig";
+import Comment from "../components/Comment";
+import LoadingScreen from "../components/LoadingScreen";
 
 const TournamentDetail = () => {
-  const { id } = useParams()
-  const [tournament,setTournament] = useState();
+  const { id } = useParams();
+  const [tournament, setTournament] = useState();
   const [isLoading, setIsLoading] = useState(false);
+  const [showTournamentInfo, setShowTournamentInfo] = useState(false);
 
-
-/* useEffect(() => {
-  const apiUrl = import.meta.env.VITE_API_URL;
-  const device_id = localStorage.getItem("device_id");
-  
-  try {
-    const interval = setInterval(async () => {
-
-    const res = await axios.post(`${apiUrl}/getMuxStreamUrl`, {
-      productId: id
-    } ,{headers:{
-       device_id
-    }},{
-    withCredentials: true,
-  }
-    
-  )
-  console.log("video link",res.data)
-  }, 20000);
-  } catch (error) {
-    console.log("getLink error:", error)
-  }
-
-  
-
-  return () => clearInterval(interval);
-}, []); */
-
-
-
-   useEffect(() => {
-
+  useEffect(() => {
     const fetchTournaments = async () => {
       setIsLoading(true);
       try {
-        const docRef = doc(db, "tournaments" , id);
+        const docRef = doc(db, "tournaments", id);
         const docSnap = await getDoc(docRef);
 
-        if(docSnap.exists()){
-          const tournamentData = {
+        if (docSnap.exists()) {
+          setTournament({
             id: docSnap.id,
-            ...docSnap.data()
-          }
-          setTournament(tournamentData)
-          console.log(tournamentData)
+            ...docSnap.data(),
+          });
         }
-      
       } catch (error) {
-        console.log(error)
-      }finally{
-        setIsLoading(false)
+        console.log(error);
+      } finally {
+        setIsLoading(false);
       }
-     
-    }
-     fetchTournaments();
-  }, [])
+    };
 
-  if(isLoading){
-    return  <div className="flex  items-center justify-center bg-[#060b18] min-h-screen">
-      <div className="flex flex-col items-center gap-4">
-        
-        {/* Spinner */}
-        <div className="relative h-14 w-14 sm:h-16 sm:w-16">
-          <div className="absolute inset-0 animate-spin rounded-full border-4 border-[#152345] border-t-[#f6e925]" />
-        </div>
+    fetchTournaments();
+  }, [id]);
 
-        {/* Text */}
-        <p className="text-xs font-semibold tracking-widest text-slate-300 sm:text-sm">
-          Loading tournaments...
-        </p>
-      </div>
-    </div>
+  if (isLoading) {
+    return <LoadingScreen />;
   }
+
   if (!tournament) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#070a14] px-6 text-white">
-
-        <div className="text-center max-w-md space-y-4">
-
-          {/* Icon / Visual cue */}
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#0c142b] border border-[#2d3d63]">
-            <span className="text-2xl">🎮</span>
-          </div>
-
-          {/* Title */}
-          <h1 className="text-2xl font-bold tracking-wide">
-            Tournament Not Found
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-slate-400 text-sm leading-relaxed">
-            The tournament you are looking for doesn’t exist or may have been removed.
-          </p>
-
-          {/* Action button */}
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center mt-4 rounded-md bg-cyan-500 px-5 py-2 text-sm font-semibold text-black transition hover:bg-cyan-400"
-          >
-            Back to Home
-          </Link>
-
-        </div>
+      <div className="min-h-screen flex items-center justify-center text-white bg-gradient-to-br from-[#060b18] to-[#0a0f1e]">
+        Tournament Not Found
       </div>
-    )
+    );
   }
 
+  const hasVideo =
+    tournament.streamEmbedUrl &&
+    tournament.streamEmbedUrl.length > 0;
+
   return (
-    <main className="min-h-screen bg-[#060b18] px-4 py-5 text-white sm:px-6 mt-15">
-      <div className="mx-auto max-w-6xl space-y-4 pb-10">
+    <main className="mt-15 min-h-screen bg-gradient-to-br from-[#060b18] via-[#070d1a] to-[#0b1223] text-white">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 space-y-6">
+
+        {/* HEADER WITH BACK BUTTON */}
         <div className="flex items-center justify-between">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 rounded-md border border-[#2d3d63] bg-[#0c142b] px-4 py-2 text-sm font-semibold text-slate-200"
+          <Link 
+            className="group text-sm text-slate-300 hover:text-cyan-400 transition-all duration-200 flex items-center gap-2 bg-white/5 hover:bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm" 
+            to={"/tournament"}
           >
-            <ArrowLeft size={16} />
-            Back
+            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+            <span className="hidden sm:inline font-medium">Back to Tournaments</span>
+            <span className="sm:hidden font-medium">Back</span>
           </Link>
         </div>
 
-        <section className="grid gap-4 lg:grid-cols-[1.8fr_1fr]">
-          <div className="overflow-hidden rounded-md border border-[#2d3d63] bg-black">
-            {
-              
-              tournament.status === 'Upcoming' || tournament.status === 'Live' && !tournament.isLiveStart ?
-                <div className="relative h-[230px] w-full sm:h-[360px] overflow-hidden rounded-xl bg-black group">
+        {/* RESPONSIVE GRID LAYOUT */}
+        <section className="grid gap-6 lg:grid-cols-3 lg:gap-8">
 
-                  {/* Background Image */}
-                  <img
-                    src={tournament.thumbnail}
-                    alt="Tournament thumbnail"
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
+          {/* MAIN CONTENT - LEFT/CENTER */}
+          <div className="lg:col-span-2 space-y-6">
 
-                  {/* Dark Overlay for readability */}
-                  <div className="absolute inset-0 bg-black/50" />
-
-                  {/* Center Content */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-                    <p className="text-2xl sm:text-4xl font-bold tracking-widest">
-                      COMING SOON
-                    </p>
-                  </div>
-
+            {/* VIDEO HERO SECTION */}
+            <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden relative shadow-2xl shadow-cyan-500/10 ring-1 ring-white/10 group">
+              {/* Live indicator glow */}
+              {tournament.isLiveStart && (
+                <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-red-600/80 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold tracking-wider animate-pulse">
+                  <span className="w-2 h-2 bg-white rounded-full" />
+                  LIVE
                 </div>
+              )}
+              {tournament.isLiveStart ? (
+                <iframe
+                  className="absolute top-0 left-0 w-full h-full border-0"
+                  src={tournament.streamEmbedUrl}
+                  allowFullScreen
+                  title="Tournament Stream"
+                />
+              ) : (
+                <img
+                  src={tournament.thumbnail}
+                  alt="Tournament thumbnail"
+                  className="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+              )}
+              {/* Subtle gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
+            </div>
 
-                :
-                <div className="relative w-full aspect-video bg-black overflow-hidden rounded-md">
-                  <iframe
-                    className="absolute top-0 left-0 w-full h-full border-0"
-                    src={tournament.streamEmbedUrl}
-                   
-                    allow="autoplay; encrypted-media; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
-            }
-
+            {/* COMMENTS SECTION (not fixed anymore – proper flow) */}
+            <div className="w-full">
+              <Comment />
+            </div>
           </div>
-          <aside className="space-y-3 rounded-md border border-[#2d3d63] bg-[#0c142b] p-4">
-            <h1 className="text-xl font-black uppercase sm:text-2xl">{tournament.title}</h1>
-            <p className="text-sm text-slate-300">{tournament.description}</p>
-            <div className="space-y-1 text-sm text-slate-300">
-              <p>Game: {tournament.game}</p>
-               <span>
-  {tournament.dateTime ? new Date(tournament.dateTime?.seconds * 1000).toLocaleString() : ""}
-</span>
-              <p>Prize Pool: {tournament.prizePool}</p>
+
+          {/* DESKTOP TOURNAMENT INFO - SIDEBAR */}
+          <aside className="hidden lg:flex lg:flex-col gap-6">
+            {/* Sticky glass-morphism card */}
+            <div className="bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl sticky top-6 shadow-xl shadow-cyan-500/5">
+              <h2 className="font-bold text-xl mb-6 text-white flex items-center gap-2">
+                <span className="w-1.5 h-6 bg-cyan-400 rounded-full" />
+                Tournament Info
+              </h2>
+
+              <div className="space-y-5">
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-slate-400 font-semibold mb-2">
+                    Game
+                  </p>
+                  <p className="text-base text-cyan-300 font-medium">
+                    {tournament.game}
+                  </p>
+                </div>
+
+                <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-slate-400 font-semibold mb-2">
+                    Prize Pool
+                  </p>
+                  <p className="text-2xl font-bold bg-gradient-to-r from-cyan-300 to-blue-400 bg-clip-text text-transparent">
+                    {tournament.prizePool}
+                  </p>
+                </div>
+
+                <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-slate-400 font-semibold mb-2">
+                    Status
+                  </p>
+                  <span className="inline-block bg-cyan-500/20 text-cyan-300 px-4 py-1.5 rounded-full text-sm font-semibold border border-cyan-500/30 backdrop-blur-sm">
+                    {tournament.status}
+                  </span>
+                </div>
+
+                <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-slate-400 font-semibold mb-2">
+                    Date & Time
+                  </p>
+                  <p className="text-sm text-slate-200 font-medium">
+                    {tournament.dateTime
+                      ? new Date(
+                          tournament.dateTime.seconds * 1000
+                        ).toLocaleString('en-US', {
+                          month: 'long',
+                          day: 'numeric',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })
+                      : ""}
+                  </p>
+                </div>
+              </div>
             </div>
           </aside>
         </section>
       </div>
     </main>
-  )
-}
+  );
+};
 
-export default TournamentDetail
+export default TournamentDetail;

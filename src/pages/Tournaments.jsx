@@ -8,6 +8,7 @@ import { useAuth } from "../context/AuthContext";
 import axios from 'axios';
 import { FaUser, FaSignOutAlt } from "react-icons/fa";
 import LoadingScreen from '../components/LoadingScreen';
+import Sponsor from '../components/Sponsor';
 
 const Tournaments = () => {
   const [activeTab, setActiveTab] = useState('ALL');
@@ -79,7 +80,7 @@ const Tournaments = () => {
   }, []);
 
   useEffect(() => {
-    console.log(user)
+    //console.log(user)
   }, [user])
 
   useEffect(() => {
@@ -87,7 +88,7 @@ const Tournaments = () => {
       setIsLoading(true);
       try {
         const querySnapShot = await getDocs(collection(db, "tournaments"));
-        console.log(querySnapShot.docs);
+       // console.log(querySnapShot.docs);
        const tournamentsList =  querySnapShot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
@@ -97,7 +98,7 @@ const Tournaments = () => {
       const featured = tournamentsList.find((item) => item.featured) ?? tournamentsList[0]
       setFeaturedTournament(featured);
 
-      console.log(tournamentsList);
+      //console.log(tournamentsList);
       setIsLoading(false)
       } catch (error) {
         console.log(error)
@@ -111,6 +112,7 @@ const Tournaments = () => {
   return (
     <main className="min-h-screen bg-[#060b18] pb-28 text-white ">
 
+     {/*  <Sponsor /> */}
       <section className="pt-5 sm:pt-6 mt-8">
         {
           isLoading 

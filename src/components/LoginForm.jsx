@@ -46,7 +46,7 @@ const LoginForm = () => {
       const { data } = await axios.post(
         `${apiUrl}/authApi/login`,
         { phone: cleanNumber, password, platform: "esport" },
-        { headers: { "x-device-id": deviceId } }
+        { headers: { "x-device-id": deviceId } ,   withCredentials: true, }
       );
 
       if (data?.success && data?.customToken) {
@@ -95,7 +95,7 @@ const LoginForm = () => {
         <form onSubmit={login} className="px-6 py-6 sm:px-10 sm:pb-8 flex flex-col gap-4 sm:gap-5">
           <div className="text-center">
             <h2 className="text-2xl sm:text-3xl font-black text-green-900 uppercase tracking-tighter italic leading-tight">
-              Official <span className="text-green-600">Login</span>
+               <span className="text-green-600">Login</span>
             </h2>
             <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">
               Boxing And FIFA Tournament
