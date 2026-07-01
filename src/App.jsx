@@ -4,8 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import RegisterForm from "./components/RegisterForm";
 import LoginForm from "./components/LoginForm";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Tournaments from "./pages/Tournaments";
-import TournamentDetail from "./pages/TournamentDetail";
+import Events from "./pages/Events";
+import EventDetail from "./pages/EventDetail";
 import UserProfilePage from "./pages/UserProfilePage";
 import PaymentPage from "./pages/PaymentPage";
 import ForgottenPassword from "./components/ForgottenPassword";
@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import { Dot } from "lucide-react";
 import { db } from "./config/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
+import LoadingScreen from "./components/LoadingScreen";
 
 
 
@@ -23,33 +24,39 @@ const App = () => {
 
   const { user, loading } = useAuth();
   const [hasAccount, setHasAccount] = useState(null);
+  const [checkingProfile, setCheckingProfile] = useState(true);
 
   useEffect(() => {
     const checkUserProfile = async () => {
-      // If still loading or no user, do nothing
       if (loading || !user) return;
 
-      try {
-        const userRef = doc(db, 'stream_users', user.uid);
-        const docSnap = await getDoc(userRef);
-        console.log("user=>",user)
+      setCheckingProfile(true);
 
-        if (docSnap.exists()) {
-          setHasAccount(true); // <--- Add this!
-        } else {
-          setHasAccount(false);
-          //console.log('dont have account =========>');
-        }
+      try {
+        const userRef = doc(db, "stream_users", user.uid);
+        const docSnap = await getDoc(userRef);
+
+        setHasAccount(docSnap.exists());
       } catch (error) {
-        console.error('Error checking user profile:', error);
-        // Depending on requirements, you might want to set hasAccount(false) 
-        // or handle the error state specifically
+        console.error("Error checking user profile:", error);
+        setHasAccount(false); // optional fallback
+      } finally {
+        setCheckingProfile(false);
       }
     };
+
     checkUserProfile();
   }, [loading, user]);
 
-  //if(user && !hasAccount) return <CreateStreamUserAccount />
+  if (loading || checkingProfile) {
+    return <LoadingScreen />
+  }
+
+  if (user && hasAccount === false) {
+    return <CreateStreamUserAccount />;
+  }
+
+
 
   return (
 
@@ -73,15 +80,15 @@ const App = () => {
       } />
 
       <Route element={<ProtectedRoute />}>
-        <Route path="/tournament" element={
+        <Route path="/event" element={
           <>
-            <Tournaments />
+            <Events />
           </>
         } />
 
-        <Route path="/tournament/:id" element={
+        <Route path="/event/:id" element={
           <>
-            <TournamentDetail />
+            <EventDetail />
           </>
         } />
 

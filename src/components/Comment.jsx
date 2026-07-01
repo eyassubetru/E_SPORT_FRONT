@@ -1,31 +1,60 @@
 import React, { useState } from "react";
 import { MessageCircle, Send, Sparkles } from "lucide-react";
+import CommentItem from "./CommentItem";
 
 const initialComments = [
- /*  {
+  {
     id: 1,
-    name: "Eyob",
-    avatar: "E",
-    time: "2 hours ago",
-    text: "Can't wait for this tournament 🔥",
+    name: "Alex Morgan",
+    avatar: "AM",
+    time: "2 min ago",
+    text: "This is an absolutely fantastic breakdown. Thanks for sharing!",
     replies: [
       {
-        id: 11,
-        name: "Hana",
-        avatar: "H",
-        time: "1 hour ago",
-        text: "Same here 🙌",
+        id: 51,
+        name: "bruce_wayne",
+        avatar: "BW",
+        time: "1 hr ago",
+        text: "Can someone explain how this scales with larger datasets?",
+        replies: [
+          {
+            id: 142,
+            name: "Yuki Tanaka",
+            avatar: "YT",
+            time: "10 min ago",
+            text: "Does this support concurrent requests out of the box?",
+            replies: []
+          }
+        ]
       },
-    ],
+      {
+        id: 89,
+        name: "Sarah Connor",
+        avatar: "SC",
+        time: "3 hr ago",
+        text: "Ran into this exact issue yesterday. This fix worked like a charm.",
+        replies: []
+      }
+    ]
   },
   {
     id: 2,
-    name: "Samuel",
-    avatar: "S",
-    time: "20 minutes ago",
-    text: "Who else is supporting Team Ethiopia? 🇪🇹",
-    replies: [],
-  }, */
+    name: "Elena Rostova",
+    avatar: "ER",
+    time: "1 day ago",
+    text: "Brilliant write-up. Extremely clear and concise.",
+    replies: [
+      {
+        id: 64,
+        name: "Jane Doe",
+        avatar: "JD",
+        time: "2 days ago",
+        text: "Wow, I never looked at it from this perspective before.",
+        replies: []
+      }
+    ]
+  }
+  // ... structurally scales up to id: 500 across deep nested reply chains
 ];
 
 const Comment = () => {
@@ -33,7 +62,9 @@ const Comment = () => {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [replyingTo, setReplyingTo] = useState(null);
-  const [replyText, setReplyText] = useState("");
+  const [replyTexts, setReplyTexts] = useState({});
+
+
 
   const handleAddComment = () => {
     if (!newComment.trim()) return;
@@ -53,32 +84,51 @@ const Comment = () => {
     setNewComment("");
   };
 
-  const handleAddReply = (commentId) => {
-    if (!replyText.trim()) return;
+  const addReply = (items, targetId, newReply) => {
+    return items.map((item) => {
+      if (item.id === targetId) {
+        return {
+          ...item,
+          replies: [...item.replies, newReply],
+        };
+      }
 
-    setComments((prev) =>
-      prev.map((c) =>
-        c.id === commentId
-          ? {
-              ...c,
-              replies: [
-                ...c.replies,
-                {
-                  id: Date.now(),
-                  name: "You",
-                  avatar: "Y",
-                  time: "Just now",
-                  text: replyText,
-                },
-              ],
-            }
-          : c
-      )
-    );
-
-    setReplyText("");
-    setReplyingTo(null);
+      return {
+        ...item,
+        replies: addReply(
+          item.replies,
+          targetId,
+          newReply
+        ),
+      };
+    });
   };
+
+const handleAddReply = (targetId) => {
+  const text = replyTexts[targetId]?.trim();
+
+  if (!text) return;
+
+  const newReply = {
+    id: Date.now(),
+    name: "You",
+    avatar: "Y",
+    time: "Just now",
+    text,
+    replies: [],
+  };
+
+  setComments((prev) =>
+    addReply(prev, targetId, newReply)
+  );
+
+  setReplyTexts((prev) => ({
+    ...prev,
+    [targetId]: "",
+  }));
+
+  setReplyingTo(null);
+};
 
   return (
     <div className="w-full bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden shadow-xl shadow-cyan-500/5 transition-all duration-300">
@@ -164,98 +214,15 @@ const Comment = () => {
                 </div>
               ) : (
                 comments.map((c) => (
-                  <div key={c.id} className="pt-5 first:pt-0">
-                    <div className="flex gap-3 sm:gap-4">
-
-                      {/* AVATAR */}
-                      <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center flex-shrink-0 text-slate-200 font-bold text-sm shadow-inner border border-white/5">
-                        {c.avatar}
-                      </div>
-
-                      {/* COMMENT CONTENT */}
-                      <div className="flex-1 min-w-0">
-                        {/* HEADER */}
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                          <span className="font-bold text-sm sm:text-base text-white">
-                            {c.name}
-                          </span>
-                          <span className="text-xs text-slate-500">
-                            {c.time}
-                          </span>
-                        </div>
-
-                        {/* TEXT */}
-                        <p className="text-sm sm:text-base text-slate-300 mt-2 leading-relaxed break-words">
-                          {c.text}
-                        </p>
-
-                        {/* REPLY BUTTON */}
-                        <button
-                          onClick={() =>
-                            setReplyingTo(
-                              replyingTo === c.id ? null : c.id
-                            )
-                          }
-                          className="text-xs sm:text-sm text-slate-400 hover:text-cyan-400 transition-colors mt-3 font-medium flex items-center gap-1"
-                        >
-                          <MessageCircle size={14} />
-                          {replyingTo === c.id ? 'Cancel' : 'Reply'}
-                        </button>
-
-                        {/* REPLY INPUT */}
-                        {replyingTo === c.id && (
-                          <div className="flex gap-2 mt-3 bg-white/10 backdrop-blur-sm p-3 rounded-xl border border-white/10">
-                            <input
-                              value={replyText}
-                              onChange={(e) =>
-                                setReplyText(e.target.value)
-                              }
-                              onKeyPress={(e) => e.key === 'Enter' && handleAddReply(c.id)}
-                              className="flex-1 bg-transparent outline-none text-sm text-white placeholder-slate-400"
-                              placeholder="Write a reply..."
-                              autoFocus
-                            />
-
-                            <button
-                              onClick={() => handleAddReply(c.id)}
-                              disabled={!replyText.trim()}
-                              className="bg-cyan-500 hover:bg-cyan-400 disabled:bg-slate-600 text-white px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 shadow-md"
-                            >
-                              <Send size={14} />
-                            </button>
-                          </div>
-                        )}
-
-                        {/* REPLIES */}
-                        {c.replies.length > 0 && (
-                          <div className="mt-4 ml-0 sm:ml-2 border-l-2 border-cyan-500/30 pl-4 space-y-4">
-                            {c.replies.map((r) => (
-                              <div key={r.id} className="flex gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center flex-shrink-0 text-white text-xs font-bold border border-white/5">
-                                  {r.avatar}
-                                </div>
-
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                                    <p className="text-sm font-bold text-white">
-                                      {r.name}
-                                    </p>
-                                    <span className="text-xs text-slate-500">
-                                      {r.time}
-                                    </span>
-                                  </div>
-                                  <p className="text-sm text-slate-300 mt-1 break-words">
-                                    {r.text}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-
-                      </div>
-                    </div>
-                  </div>
+                  <CommentItem
+                    key={c.id}
+                    item={c}
+                    replyingTo={replyingTo}
+                    setReplyingTo={setReplyingTo}
+                    replyTexts={replyTexts}
+                    setReplyTexts={setReplyTexts}
+                    handleAddReply={handleAddReply}
+                  />
                 ))
               )}
             </div>

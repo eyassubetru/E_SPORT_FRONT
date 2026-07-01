@@ -1,4 +1,4 @@
-const tournaments = [
+const events = [
   { 
     id: 'et-121212',
     title: 'test ',
@@ -18,7 +18,7 @@ const tournaments = [
   },/* 
   { 
     id: 'et-101',
-    title: 'FIFA PlayStation Elite Tournament',
+    title: 'FIFA PlayStation Elite Event',
     game: 'FIFA ',
     status: 'live',
     dateTime: 'May 8, 2026 - 19:30 EAT',
@@ -112,4 +112,4 @@ const tournaments = [
 
 export const STATUS_TABS = ['ALL', 'LIVE', 'COMPLETED', 'UPCOMING']
 
-export default tournaments
+export default events

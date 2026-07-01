@@ -51,7 +51,7 @@ const LoginForm = () => {
 
       if (data?.success && data?.customToken) {
         await signInWithCustomToken(auth, data.customToken);
-        navigate("/tournament");
+        navigate("/event");
         setResponse({ status: "success", message: "Logged in successfully" });
       } else {
         setResponse({
@@ -70,7 +70,7 @@ const LoginForm = () => {
   };
 
   useEffect(() => {
-    if (user) navigate("/tournament");
+    if (user) navigate("/event");
   }, [user, navigate]);
 
   return (
@@ -87,7 +87,7 @@ const LoginForm = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-black/10 z-10" />
           <img
             src="/new-image-hero.png"
-            alt="Tournament Banner"
+            alt="Event Banner"
             className="w-full h-full object-cover"
           />
         </div>
@@ -98,7 +98,7 @@ const LoginForm = () => {
                <span className="text-green-600">Login</span>
             </h2>
             <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">
-              Boxing And FIFA Tournament
+              Boxing And FIFA Event
             </p>
           </div>
 
@@ -215,7 +215,7 @@ const LoginForm = () => {
         {/* Sponsor Section */}
         <div className="bg-gray-50/80 border-t border-gray-100 p-6 flex flex-col items-center">
           <p className="text-[10px] font-black text-green-900/30 uppercase tracking-[0.4em] mb-4">
-            Tournament Partners
+            Event Partners
           </p>
           <div className="flex flex-col items-center group cursor-default">
             <div className="relative">

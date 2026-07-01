@@ -52,8 +52,7 @@ const ForgottenPassword = () => {
       }
 
       const deviceId = getOrCreateDeviceId();
-      const { data } = await axios.post(
-        `${apiUrl}/authApi/resetPassword`,
+      const { data } = await axios.post(`${apiUrl}/authApi/resetPassword`,
         { phone: cleanNumber, newPassword: password, otpCode: OTP },
         { headers: { "x-device-id": deviceId } }
       );
@@ -61,7 +60,7 @@ const ForgottenPassword = () => {
       if (data.success && data.customToken) {
         await signInWithCustomToken(auth, data.customToken);
         setResponse({ status: "success", message: "Password reset successfully" });
-        navigate("/tournament");
+        navigate("/event");
       } else {
         setResponse({ status: 'error', message: data.message || "Reset failed" });
       }
@@ -85,8 +84,7 @@ const ForgottenPassword = () => {
         return;
       }
       const deviceId = getOrCreateDeviceId();
-      const { data } = await axios.post(
-        `${apiUrl}/authApi/sendOtp`,
+      const { data } = await axios.post(`${apiUrl}/authApi/sendOtp`,
         { phoneNumber: cleanNumber, signInOption: "password_reset" }
       );
       if (!data.success) {
@@ -116,7 +114,7 @@ const ForgottenPassword = () => {
   };
 
   useEffect(() => {
-    if (user) navigate("/tournament");
+    if (user) navigate("/event");
   }, [user, navigate]);
 
   useEffect(() => {
@@ -143,7 +141,7 @@ const ForgottenPassword = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-black/10 z-10" />
           <img
             src="/new-image-hero.png"
-            alt="Tournament Banner"
+            alt="Event Banner"
             className="w-full h-full object-cover"
           />
         </div>
@@ -154,7 +152,7 @@ const ForgottenPassword = () => {
               Reset <span className="text-green-600">Password</span>
             </h2>
             <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">
-              Boxing And FIFA Tournament
+              Boxing And FIFA Event
             </p>
           </div>
 
@@ -299,7 +297,7 @@ const ForgottenPassword = () => {
         {/* Sponsor Section */}
         <div className="bg-gray-50/80 border-t border-gray-100 p-6 flex flex-col items-center">
           <p className="text-[10px] font-black text-green-900/30 uppercase tracking-[0.4em] mb-4">
-            Tournament Partners
+            Event Partners
           </p>
           <div className="flex flex-col items-center group cursor-default">
             <div className="relative">
