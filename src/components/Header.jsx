@@ -45,7 +45,7 @@ const Header = () => {
         </span>
 
         <span className="truncate text-[8px] sm:text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-          Tournament
+          Event
         </span>
       </div>
     </div>
@@ -92,7 +92,7 @@ const Header = () => {
       <button
         onClick={() => {
           if (location.pathname === "/profile") {
-            navigate("/tournament");
+            navigate("/event");
           } else {
             navigate("/profile");
           }
@@ -116,7 +116,9 @@ const Header = () => {
     </div>
 
   </div>
+
 </section>
+
   )
 }
 

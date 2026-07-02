@@ -4,59 +4,109 @@ import { AnimatePresence, motion } from "framer-motion";
 import RegisterForm from "./components/RegisterForm";
 import LoginForm from "./components/LoginForm";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Tournaments from "./pages/Tournaments";
-import TournamentDetail from "./pages/TournamentDetail";
+import Events from "./pages/Events";
+import EventDetail from "./pages/EventDetail";
 import UserProfilePage from "./pages/UserProfilePage";
 import PaymentPage from "./pages/PaymentPage";
+import ForgottenPassword from "./components/ForgottenPassword";
+import CreateStreamUserAccount from "./pages/CreateStreamUserAccount";
+import useAuth from "./hooks/useAuth";
+import { useEffect, useState } from "react";
+import { Dot } from "lucide-react";
+import { db } from "./config/firebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
+import LoadingScreen from "./components/LoadingScreen";
 
 
 
-const  App = () => {
+const App = () => {
   const location = useLocation();
+
+  const { user, loading } = useAuth();
+  const [hasAccount, setHasAccount] = useState(null);
+  const [checkingProfile, setCheckingProfile] = useState(true);
+
+  useEffect(() => {
+    const checkUserProfile = async () => {
+      if (loading || !user) return;
+
+      setCheckingProfile(true);
+
+      try {
+        const userRef = doc(db, "stream_users", user.uid);
+        const docSnap = await getDoc(userRef);
+
+        setHasAccount(docSnap.exists());
+      } catch (error) {
+        console.error("Error checking user profile:", error);
+        setHasAccount(false); // optional fallback
+      } finally {
+        setCheckingProfile(false);
+      }
+    };
+
+    checkUserProfile();
+  }, [loading, user]);
+
+  if (loading || checkingProfile) {
+    return <LoadingScreen />
+  }
+
+  if (user && hasAccount === false) {
+    return <CreateStreamUserAccount />;
+  }
+
+
 
   return (
 
-      <Routes location={location} key={location.pathname}>
+    <Routes location={location} key={location.pathname}>
 
-        <Route path="/" element={
+      <Route path="/" element={
+        <>
+          <LoginForm />
+        </>
+      } />
+
+      <Route path="/signup" element={
+        <>
+          < RegisterForm />
+        </>
+      } />
+      <Route path="/forgotten-password" element={
+        <>
+          < ForgottenPassword />
+        </>
+      } />
+
+      <Route element={<ProtectedRoute />}>
+        <Route path="/event" element={
           <>
-            <RegisterForm />
+            <Events />
           </>
         } />
 
-        <Route path="/login" element={
+        <Route path="/event/:id" element={
           <>
-            <LoginForm />
+            <EventDetail />
           </>
         } />
 
-        <Route element={<ProtectedRoute />}>
-          <Route path="/tournament" element={
-            <>
-              <Tournaments />
-            </>
-          } />
+        <Route path="/profile" element={
+          <>
+            <UserProfilePage />
+          </>
+        } />
 
-          <Route path="/tournament/:id" element={
-            <>
-              <TournamentDetail />
-            </>
-          } />
+        {/* <Route path="/payment" element={
+          <>
+            <PaymentPage />
+          </>
+        } /> */}
 
-          <Route path="/profile" element={
-            <>
-              <UserProfilePage />
-            </>
-          } />
+      </Route>
 
-          <Route path="/payment" element={
-            <>
-              <PaymentPage />
-            </>
-          } />
-        </Route>
-
-      </Routes>
+    </Routes>
 
   );
 }

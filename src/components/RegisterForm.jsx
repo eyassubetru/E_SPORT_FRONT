@@ -71,7 +71,7 @@ const RegisterForm = () => {
                 return
             }
             const deviceId = getOrCreateDeviceId();
-            const response = await axios.post(`${apiUrl}/signupUser`, {
+                   const response = await axios.post(`${apiUrl}/authApi/signup`, {
                 "phone": cleanNumber,
                 "newPassword": password,
                 "otpCode": OTP
@@ -103,7 +103,7 @@ const RegisterForm = () => {
         } catch (error) {
             console.log(error.response)
             setResponse({
-                status: 'error', status: 'error',
+                status: 'error',
                 message: error.response?.data?.message ||
                     error.data?.message ||
                     "Something went wrong"
@@ -133,8 +133,9 @@ const RegisterForm = () => {
 
             const deviceId = getOrCreateDeviceId()
 
-            const response = await axios.post(`${apiUrl}/sendOTP`, {
+             const response = await axios.post(`/authApi/sendOtp`, {
                 "phoneNumber": cleanNumber,
+                 platform : "esport"
 
             },);
 
@@ -198,7 +199,7 @@ const RegisterForm = () => {
     useEffect(() => {
         if (user) {
             console.log("user", user)
-            navigate("/tournament");
+            navigate("/event");
         }
     }, [user]);
 
@@ -248,7 +249,7 @@ const RegisterForm = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-black/10 z-10" />
                     <img
                         src="/new-image-hero.png"
-                        alt="Tournament Banner"
+                        alt="Event Banner"
                         className="w-full h-full object-cover"
                     />
                 </div>
@@ -259,7 +260,7 @@ const RegisterForm = () => {
                             Official <span className="text-green-600">Entry</span>
                         </h2>
                         <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">
-                           Boxing And FIFA Tournament 
+                           Boxing And FIFA Event 
                         </p>
                     </div>
 
@@ -414,7 +415,7 @@ const RegisterForm = () => {
 
                     <div
                         className='text-center text-[13px]  text-green-800 uppercase tracking-widest ml-1'
-                        onClick={() => { navigate('/login') }}
+                        onClick={() => { navigate('/') }}
                     >
                         <p className='cursor-pointer'>already have account
                             <span className='text-green-900 underline font-bold'>Login</span>
@@ -426,7 +427,7 @@ const RegisterForm = () => {
                 {/* Sponsor Section */}
                 <div className="bg-gray-50/80 border-t border-gray-100 p-6 flex flex-col items-center">
                     <p className="text-[10px] font-black text-green-900/30 uppercase tracking-[0.4em] mb-4">
-                        Tournament Partners
+                        Event Partners
                     </p>
                     <div className="flex flex-col items-center group cursor-default">
                         <div className="relative">

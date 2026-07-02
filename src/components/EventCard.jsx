@@ -9,62 +9,66 @@ const badgeClassByStatus = {
   completed: 'bg-[#f6e925]/15 text-[#f6e925] border-[#f6e925]/50',
 }
 
-const TournamentCard = ({ tournament }) => {
+const EventCard = ({ event }) => {
   const isPay = false;
-  const statusKey = tournament.status.toLowerCase()
-  const { user, loading} = useAuth();
+  const statusKey = event.status.toLowerCase()
+  const { user, loading } = useAuth();
 
   return (
     <article className="group rounded-md border border-[#2d3d63] bg-[#0c142b] p-3 shadow-xl shadow-black/20 transition-transform duration-300 hover:-translate-y-1">
       <div className="relative h-44 overflow-hidden rounded-sm">
         <img
-          src={tournament.thumbnail}
-          alt={tournament.title}
+          src={event.thumbnail}
+          alt={event.title}
           className="h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-black/35" />
         <div className="absolute left-3 top-3 rounded-full border border-white/20 bg-black/55 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-white/90">
-          {tournament.game}
+          {event.game}
         </div>
       </div>
 
       <div className="space-y-3 px-1 pt-4">
         <div className="flex items-start justify-between gap-3">
-          <h3 className="text-base font-bold uppercase text-white">{tournament.title}</h3>
+          <h3 className="text-base font-bold uppercase text-white">{event.title}</h3>
           <span
             className={`rounded-full border px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${badgeClassByStatus[statusKey]}`}
           >
-            {tournament.status}
+            {event.status}
           </span>
         </div>
 
-        <p className="text-sm leading-6 text-slate-300">{tournament.description}</p>
+        <p className="text-sm leading-6 text-slate-300">{event.description}</p>
 
         <div className="grid grid-cols-2 gap-2 text-xs text-slate-300">
-          <div className="flex items-center gap-1.5">
-            <Calendar size={14} className="text-[#8bc2ff]" />
-           <span>
-  {tournament.dateTime ? new Date(tournament.dateTime?.seconds * 1000).toLocaleString() : ""}
-</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Trophy size={14} className="text-[#f6e925]" />
-            <span>{tournament.prizePool}</span>
-          </div>
+          {
+            event.dateTime && <div className="flex items-center gap-1.5">
+              <Calendar size={14} className="text-[#8bc2ff]" />
+              <span>
+                {event.dateTime ? new Date(event.dateTime?.seconds * 1000).toLocaleString() : ""}
+              </span>
+            </div>
+          }
+          {event.prizePool > 0 &&
+            <div className="flex items-center gap-1.5">
+              <Trophy size={14} className="text-[#f6e925]" />
+              <span>{event.prizePool}</span>
+            </div>
+          } 
         </div>
 
         <Link
-          to={ `/tournament/${tournament.id}` }
+          to={`/event/${event.id}`}
           className="block rounded-md bg-[#268dff] px-4 py-3 text-center text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-[#4da2ff]"
         >
           {
-          'Watch'
+            'Watch'
           }
-          
+
         </Link>
       </div>
     </article>
   )
 }
 
-export default TournamentCard
+export default EventCard

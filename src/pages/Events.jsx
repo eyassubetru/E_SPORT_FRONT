@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import /* tournaments, */ { STATUS_TABS } from '../data/tournaments'
-import TournamentCard from '../components/TournamentCard'
+import /* events, */ { STATUS_TABS } from '../data/events'
+import EventCard from '../components/EventCard'
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth, db } from '../config/firebaseConfig'
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
@@ -8,13 +8,14 @@ import { useAuth } from "../context/AuthContext";
 import axios from 'axios';
 import { FaUser, FaSignOutAlt } from "react-icons/fa";
 import LoadingScreen from '../components/LoadingScreen';
+import Sponsor from '../components/Sponsor';
 
-const Tournaments = () => {
+const Events = () => {
   const [activeTab, setActiveTab] = useState('ALL');
-  const [tournaments, setTournaments] = useState([]);
+  const [events, setEvents] = useState([]);
   const [showBottomNav, setShowBottomNav] = useState(false)
   const tabsRef = useRef(null)
-  const [featuredTournament, setFeaturedTournament] = useState(null);
+  const [featuredEvent, setFeaturedEvent] = useState(null);
   const [showFirst, setShowFirst] = useState(true);
   const [userData, setUserData] = useState(null);
   const { user, loading } = useAuth();
@@ -23,10 +24,10 @@ const Tournaments = () => {
 
 
 
-  const filteredTournaments = useMemo(() => {
-    if (activeTab === 'ALL') return tournaments
-    return tournaments.filter((item) => item.status.toUpperCase() === activeTab)
-  }, [activeTab,tournaments])
+  const filteredEvents = useMemo(() => {
+    if (activeTab === 'ALL') return events
+    return events.filter((item) => item.status.toUpperCase() === activeTab)
+  }, [activeTab,events])
 
 
   const handleLogout = async (e) => {
@@ -79,38 +80,39 @@ const Tournaments = () => {
   }, []);
 
   useEffect(() => {
-    console.log(user)
+    //console.log(user)
   }, [user])
 
   useEffect(() => {
-    const fetchTournaments = async () => {
+    const fetchEvents = async () => {
       setIsLoading(true);
       try {
-        const querySnapShot = await getDocs(collection(db, "tournaments"));
-        console.log(querySnapShot.docs);
-       const tournamentsList =  querySnapShot.docs.map(doc => ({
+        const querySnapShot = await getDocs(collection(db, "events"));
+       // console.log(querySnapShot.docs);
+       const eventsList =  querySnapShot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
 
-      setTournaments(tournamentsList);
-      const featured = tournamentsList.find((item) => item.featured) ?? tournamentsList[0]
-      setFeaturedTournament(featured);
+      setEvents(eventsList);
+      const featured = eventsList.find((item) => item.featured) ?? eventsList[0]
+      setFeaturedEvent(featured);
 
-      console.log(tournamentsList);
+      //console.log(eventsList);
       setIsLoading(false)
       } catch (error) {
         console.log(error)
       }
      
     }
-     fetchTournaments();
+     fetchEvents();
   }, [loading])
 
 
   return (
     <main className="min-h-screen bg-[#060b18] pb-28 text-white ">
 
+     {/*  <Sponsor /> */}
       <section className="pt-5 sm:pt-6 mt-8">
         {
           isLoading 
@@ -125,7 +127,7 @@ const Tournaments = () => {
 
         {/* Text */}
         <p className="text-xs font-semibold tracking-widest text-slate-300 sm:text-sm">
-          Loading tournaments...
+          Loading events...
         </p>
       </div>
     </div>
@@ -133,8 +135,8 @@ const Tournaments = () => {
            <div className="relative overflow-hidden">
           <div className="relative w-full aspect-video overflow-hidden">
             <img
-              src={featuredTournament?.thumbnail}
-              alt={featuredTournament?.title}
+              src={featuredEvent?.thumbnail}
+              alt={featuredEvent?.title}
               className="w-full h-full object-cover"
             />
           </div>
@@ -149,17 +151,17 @@ const Tournaments = () => {
 
             
             <h1 className="mt-1 max-w-4xl  md:text-2xl font-black leading-[1.1] text-white sm:text-4xl md:text-5xl lg:text-6xl">
-              {featuredTournament?.title}
+              {featuredEvent?.title}
             </h1>
 
             {/* Description: Hidden or clamped on very small screens to prevent overlap, full view on desktop */}
             <p className="mt-2 max-w-2xl line-clamp-2 text-xs leading-relaxed text-slate-200 sm:line-clamp-none sm:text-base md:text-lg">
-              {featuredTournament?.description}
+              {featuredEvent?.description}
             </p>
 
          
             <a
-              href={`#${featuredTournament?.id}`}
+              href={`#${featuredEvent?.id}`}
               onClick={() => { setActiveTab('ALL') }}
               className="mt-1 md:mt-4 inline-flex items-center rounded-md bg-[#f6e925] py-1 px-2 md:px-4 md:py-2 text-xs font-extrabold text-[#0c1227] transition-all hover:scale-105 hover:bg-[#fff34f] sm:px-6 sm:py-3 sm:text-sm"
             >
@@ -194,13 +196,13 @@ const Tournaments = () => {
       <section className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid gap-4 transition-all duration-300 sm:grid-cols-2 lg:grid-cols-3">
           
-          {filteredTournaments.map((tournament) => (
+          {filteredEvents.map((event) => (
             <div
-              key={tournament.id}
-              id={tournament.id}
+              key={event.id}
+              id={event.id}
               className="animate-[fadeIn_250ms_ease-out]"
             >
-              <TournamentCard tournament={tournament} />
+              <EventCard event={event} />
             </div>
           ))}
         </div>
@@ -228,4 +230,4 @@ const Tournaments = () => {
   )
 }
 
-export default Tournaments
+export default Events

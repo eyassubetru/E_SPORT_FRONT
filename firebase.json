@@ -6,7 +6,21 @@
       "**/.*",
       "**/node_modules/**"
     ],
-    "rewrites": [
+   "rewrites": [
+      {
+        "source": "/authApi/**",
+        "function": {
+          "id": "authApi",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/eStreamApi/**",
+        "function": {
+          "id": "eStreamApi",
+          "region": "us-central1"
+        }
+      },
       {
         "source": "**",
         "destination": "/index.html"
