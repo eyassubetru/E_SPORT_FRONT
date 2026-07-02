@@ -1,12 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PaymentOption from "../components/PaymentOption";
 import PayWithTeleBirr from "../components/PayWithTeleBirr";
 import PayWithCBE from "../components/PayWithCBE";
 import { AnimatePresence, motion } from "framer-motion";
+import axios from "axios";
 
 
 const PaymentPage = () => {
   const [paymentMethod, setPaymentMethod] = useState("options");
+
+
+
 
   const renderPage = () => {
     switch (paymentMethod) {

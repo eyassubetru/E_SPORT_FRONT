@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { MessageCircle, Send, Sparkles } from "lucide-react";
 import CommentItem from "./CommentItem";
+import axios from "axios";
 
 const initialComments = [
   {
@@ -66,8 +67,21 @@ const Comment = () => {
 
 
 
-  const handleAddComment = () => {
+  const handleAddComment = ()  => {
+
+    //eventId
+    //commentText
+    //ParentId
     if (!newComment.trim()) return;
+
+    //eStreamApi/postComment
+
+    /* try {
+      const res = axios.post()
+    } catch (error) {
+      
+    } */
+
 
     setComments((prev) => [
       {

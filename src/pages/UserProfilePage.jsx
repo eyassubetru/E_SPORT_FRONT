@@ -4,6 +4,8 @@ import { FaCrown, FaWallet, FaPhoneAlt } from "react-icons/fa";
 import useAuth from "../hooks/useAuth";
 const UserProfilePage = () => {
   const { user, loading } = useAuth();
+
+  
   useEffect(()=>{
     console.log(user)
   },[loading , user])
