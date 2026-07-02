@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { MessageCircle, Send, Sparkles } from "lucide-react";
 import CommentItem from "./CommentItem";
 import axios from "axios";
+import { useParams } from "react-router";
+import { getOrCreateDeviceId } from "../utility/getOrCreateDeviceId";
+import { auth } from "../config/firebaseConfig";
 
 const initialComments = [
   {
@@ -64,23 +67,41 @@ const Comment = () => {
   const [newComment, setNewComment] = useState("");
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyTexts, setReplyTexts] = useState({});
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const {id} = useParams()
+  const deviceId = getOrCreateDeviceId();
+  
 
-
-
-  const handleAddComment = ()  => {
-
+  const handleAddComment = async ()  => {
+      
     //eventId
     //commentText
     //ParentId
     if (!newComment.trim()) return;
-
+  
     //eStreamApi/postComment
+    const token = await auth.currentUser?.getIdToken();
+    
+    const payLoad = {
+      eventId:id,
+      commentText:newComment,
+    }
+    console.log(deviceId , token);
 
-    /* try {
-      const res = axios.post()
+    try {
+      const res = await axios.post(
+        `${apiUrl}/eStreamApi/postComment`, payLoad , 
+        {
+        headers:{
+          "x-device-id":deviceId,
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
+      console.log("res=>",res);
     } catch (error) {
-      
-    } */
+      console.log(error)
+    }
 
 
     setComments((prev) => [
