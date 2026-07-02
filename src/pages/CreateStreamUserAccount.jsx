@@ -114,7 +114,9 @@ const CreateStreamUserAccount = () => {
         handleLogout();
     } catch (error) {
       console.error("Profile update error:", error);
-      if(error.response?.data?.message === "Invalid Authorization header" || error.response?.data?.message === "Invalid session"){
+      if(error.response?.data?.message === "Invalid Authorization header" || 
+        error.response?.data?.message === "Invalid session" ||
+         error.response?.data?.message === "Session required"){
         handleLogout();
       }
       setResponse({
