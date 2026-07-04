@@ -277,7 +277,7 @@ const Comment = () => {
                 )}
               </div>
 
-              <div className="flex-1 space-y-3">
+              <div className="flex-1 space-y-3 ">
                 <input
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
@@ -289,7 +289,7 @@ const Comment = () => {
                   }}
                   disabled={sendingComment}
                   placeholder="Add a comment..."
-                  className="w-full bg-white/10 border border-white/10 focus:border-cyan-500 outline-none px-5 py-3 rounded-xl text-sm text-white placeholder-slate-400 transition-all focus:ring-2 focus:ring-cyan-500/20 backdrop-blur-sm disabled:opacity-60"
+                  className="w-full bg-white/10 border border-white/10 focus:border-cyan-500 outline-none px-5 py-3 rounded-xl text-[20px] text-white placeholder-slate-400 transition-all focus:ring-2 focus:ring-cyan-500/20 backdrop-blur-sm disabled:opacity-60 "
                 />
 
                 <div className="flex justify-end">

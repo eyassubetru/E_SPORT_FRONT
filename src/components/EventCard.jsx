@@ -1,7 +1,11 @@
 import { Calendar, Trophy } from 'lucide-react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { getOrCreateDeviceId } from '../utility/getOrCreateDeviceId';
+import { collection, doc, getDoc } from 'firebase/firestore';
+import { db } from '../config/firebaseConfig';
 
 
 
@@ -14,15 +18,115 @@ const badgeClassByStatus = {
 
 
 const EventCard = ({ event }) => {
-  const isPay = false;
   const statusKey = event.status.toLowerCase()
   const { user, loading } = useAuth();
-  const [isUserSubscribe , setIsUserSubscribe] = useState(false);
+  const [isUserSubscribe, setIsUserSubscribe] = useState(false);
+  const [isSubscriptionLoading, setIsSubscriptionLoading] = useState(false);
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const token = user.accessToken;
+  const navigate = useNavigate()
 
-  const checkUserSubscription = async (eventId) => {
-    console.log(eventId);
+  /*  const checkUserSubscription = async () => {
+     try {
+       const userRef =  collection(db ,'stream_user',user.uid);
+       const userQuerySnapShot = await getDoc(userRef);
+       const dbUser = userQuerySnapShot.doc.map((doc)=>({
+         id:doc.id,
+         ...doc.data()
+       }))
+   
+       console.log(dbUser);
+     } catch (error) {
+       console.log(error);
+     }
+     if (!user || !eventId) return;
+       console.log(eventId);
+     try {
+       setIsSubscriptionLoading(true);
+       const deviceId = getOrCreateDeviceId();
+ 
+       const { data } = await axios.get(
+         `${apiUrl}/eStreamApi/verifySubscription`,
+         {
+           params: {
+             eventId,
+           },
+           headers: {
+             "x-device-id": deviceId,
+             Authorization: `Bearer ${token}`,
+           },
+           withCredentials: true,
+         }
+       );
+ 
+       console.log(data);
+       return data;
+     } catch (error) {
+       console.log(error.response?.data);
+       navigate(`/payment/${eventId}`);
+     }finally{
+       setIsSubscriptionLoading(false);
+     }
+   }; */
+  const chapaUrl = async () => {
+
+    const payload = {
+      return_url:"https://etstream.app/event",
+      currency:"ETB",
+      email:"eyassuBetru@gmail.com",
+      phone:"0931260592"
+
+    }
+    try {
+      const res = await axios.post(
+        `${apiUrl}/eStreamApi/createChapaDeposit`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      console.log(res.data);
+    } catch (error) {
+      console.error(
+        error.response?.data || error.message
+      );
+    }
   }
 
+  const checkUserSubscription = async (eventId) => {
+    setIsSubscriptionLoading(true);
+    try {
+      const userRef = doc(db, "stream_users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        console.log("User not found");
+        return;
+      }
+
+      const dbUser = {
+        id: userSnap.id,
+        ...userSnap.data(),
+      };
+      console.log(dbUser.is_paid);
+      if (dbUser.is_paid) {
+        navigate(`/event/${eventId}`);
+      } else {
+        await chapaUrl();
+        //navigate(`/payment/${eventId}`);
+      }
+      console.log(dbUser);
+    } catch (error) {
+      console.log(error);
+    }finally{
+      setIsSubscriptionLoading(false)
+    }
+  };
   return (
     <article className="group rounded-md border border-[#2d3d63] bg-[#0c142b] p-3 shadow-xl shadow-black/20 transition-transform duration-300 hover:-translate-y-1">
       <div className="relative h-44 overflow-hidden rounded-sm">
@@ -63,27 +167,34 @@ const EventCard = ({ event }) => {
               <Trophy size={14} className="text-[#f6e925]" />
               <span>{event.prize_pool}</span>
             </div>
-          } 
+          }
         </div>
+        {
+          event?.status === "completed" ?
+            <Link
+              to={`/event/${event.id}`}
+              className="block rounded-md bg-[#268dff] px-4 py-3 text-center text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-[#4da2ff]"
+            >
+              {
+                'Watch'
+              }
 
-       {/*  <Link
-          to={`/event/${event.id}`}
-          className="block rounded-md bg-[#268dff] px-4 py-3 text-center text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-[#4da2ff]"
-        >
-          {
-            'Watch'
-          }
+            </Link>
+            :
+            <button
+              onClick={() => checkUserSubscription(event.id)}
+              disabled={isSubscriptionLoading}
+              className="w-full block rounded-md bg-[#268dff] px-4 py-3 text-center text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-[#4da2ff]"
+            >
+              {
+                isSubscriptionLoading ?
+                  <span className='animate-pulse'>loading subscription .....</span> :
+                  'Watch'
+              }
 
-        </Link> */}
-        <button
-          onClick={() => checkUserSubscription(event.id)}
-          className="w-full block rounded-md bg-[#268dff] px-4 py-3 text-center text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-[#4da2ff]"
-        >
-          {
-            'Watch'
-          }
+            </button>
+        }
 
-        </button>
       </div>
     </article>
   )

@@ -31,8 +31,8 @@ const formatRelativeTime = (createdAt) => {
     typeof createdAt.toDate === "function"
       ? createdAt.toDate()
       : createdAt.seconds
-      ? new Date(createdAt.seconds * 1000)
-      : new Date(createdAt);
+        ? new Date(createdAt.seconds * 1000)
+        : new Date(createdAt);
 
   const diffSec = Math.floor((Date.now() - date.getTime()) / 1000);
   if (diffSec < 10) return "Just now";
@@ -66,7 +66,10 @@ const CommentItem = ({
   // `profileUrl` is the already-resolved download URL that Comment.jsx
   // attaches after fetching (see resolveProfileUrl there). No more nested
   // `user` object to dig into.
-  const username = item.username || "Anonymous";
+  //console.log(item)
+  /*  const username = "+251912***" || item.username || "Anonymous"; */
+  const randomDigits = Math.floor(100 + Math.random() * 900);
+  const username = `+2519 12${randomDigits}***` || item.username;
   const isMe = currentUser?.uid === item.user_id;
   const displayName = isMe ? "You" : username;
 
@@ -177,7 +180,7 @@ const CommentItem = ({
                 }}
                 disabled={sendingReply}
                 autoFocus
-                className="flex-1 bg-slate-800/40 border border-slate-700/50 p-2.5 rounded-xl text-sm text-slate-100 outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all resize-none min-h-[42px] disabled:opacity-60"
+                className="flex-1 bg-slate-800/40 border border-slate-700/50 p-2.5 rounded-xl text-[20px] text-slate-100 outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all resize-none min-h-[42px] disabled:opacity-60"
                 placeholder={`Replying to ${username}...`}
                 rows={1}
               />

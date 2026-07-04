@@ -69,7 +69,7 @@ const UserProfilePage = () => {
                       onClick={() => (window.location.href = "/payment")}
                       className="mt-3 rounded-xl bg-yellow-500 px-4 py-2 text-sm font-bold text-black transition hover:bg-yellow-400"
                     >
-                      Upgrade to Premium
+                      
                     </button>
                   )}
                 </div>

@@ -13,7 +13,7 @@ const PaymentOption = ({paymentMethod, setPaymentMethod}) => {
               <FaCrown />
             </div>
   
-            <h1 className="mt-3 text-xl font-bold">Upgrade to Premium</h1>
+            <h1 className="mt-3 text-xl font-bold">Pay For Subscription</h1>
             <p className="text-sm text-slate-400">
               Choose your payment method
             </p>
@@ -33,7 +33,7 @@ const PaymentOption = ({paymentMethod, setPaymentMethod}) => {
                 </div>
   
                 <div className="text-left">
-                  <p className="font-semibold">Pay with Bank</p>
+                  <p className="font-semibold">Pay with CBE</p>
                   <p className="text-xs text-slate-400">
                     Bank transfer / Card payment
                   </p>
@@ -44,7 +44,7 @@ const PaymentOption = ({paymentMethod, setPaymentMethod}) => {
             </button>
   
             {/* Telebirr */}
-            <button
+          {/*   <button
               className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:bg-white/10"
                 onClick={()=>{setPaymentMethod('telebirr')}}
             >
@@ -62,7 +62,7 @@ const PaymentOption = ({paymentMethod, setPaymentMethod}) => {
               </div>
   
               <span className="text-slate-400">→</span>
-            </button>
+            </button> */}
   
           </div>
   

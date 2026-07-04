@@ -139,7 +139,7 @@ const App = () => {
           </>
         } />
 
-        <Route path="/payment" element={
+        <Route path="/payment/:id" element={
           <>
             <PaymentPage />
           </>
