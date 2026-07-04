@@ -85,7 +85,7 @@ const EventDetail = () => {
           Prize Pool
         </p>
         <p className="text-2xl font-bold bg-gradient-to-r from-cyan-300 to-blue-400 bg-clip-text text-transparent">
-          {event.prizePool}
+          {event.prize_pool}
         </p>
       </div>
 
@@ -107,8 +107,8 @@ const EventDetail = () => {
           Date & Time
         </p>
         <p className="text-sm text-slate-200 font-medium">
-          {event.dateTime
-            ? new Date(event.dateTime.seconds * 1000).toLocaleString('en-US', {
+          {event.start_date_time
+            ? new Date(event.start_date_time.seconds * 1000).toLocaleString('en-US', {
                 month: 'long',
                 day: 'numeric',
                 year: 'numeric',
@@ -122,7 +122,7 @@ const EventDetail = () => {
   );
 
   return (
-    <main className="inset-0 mt-15 min-h-screen bg-gradient-to-br from-[#060b18] via-[#070d1a] to-[#0b1223] text-white">
+    <main className="inset-0 mt-16 min-h-screen bg-gradient-to-br from-[#060b18] via-[#070d1a] to-[#0b1223] text-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 space-y-6">
 
         {/* HEADER WITH BACK BUTTON */}
@@ -168,16 +168,16 @@ const EventDetail = () => {
 
             {/* VIDEO HERO SECTION */}
             <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden relative shadow-2xl shadow-cyan-500/10 ring-1 ring-white/10 group">
-              {event.isLiveStart && (
+              {event.is_live_start && (
                 <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-red-600/80 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold tracking-wider animate-pulse">
                   <span className="w-2 h-2 bg-white rounded-full" />
                   LIVE
                 </div>
               )}
-              {event.isLiveStart ? (
+              {event.is_live_start ? (
                 <iframe
                   className="absolute top-0 left-0 w-full h-full border-0"
-                  src={event.streamEmbedUrl}
+                  src={event.stream_embed_url}
                   allowFullScreen
                   title="Event Stream"
                 />

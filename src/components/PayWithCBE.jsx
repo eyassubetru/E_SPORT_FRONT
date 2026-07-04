@@ -8,7 +8,7 @@ const PayWithCBE = ({ setPaymentMethod }) => {
   const copyAccount = async () => {
     await navigator.clipboard.writeText("1000-0000-0000-0000");
     setCopied(true);
-    setTimeout(() => setCopied(false), 1200);
+    setTimeout(() => setCopied(false), 12000);
   };
 
   return (

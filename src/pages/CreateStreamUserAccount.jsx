@@ -53,7 +53,7 @@ const CreateStreamUserAccount = () => {
     setImagePreview(null);
   };
 
-  const handleSubmit = async (e) => {
+   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setResponse({ status: "", message: "" });
@@ -90,7 +90,7 @@ const CreateStreamUserAccount = () => {
 
       const token = await user.getIdToken();
       const deviceId = getOrCreateDeviceId();
-
+      console.log(deviceId , token);
       await axios.post(`${apiUrl}/eStreamApi/setUserProfile`,
         {
           username: username.trim(),
@@ -108,20 +108,21 @@ const CreateStreamUserAccount = () => {
 
       setResponse({
         status: "success",
-        message: "Profile updated successfully!",
+        message: "Profile updated successfully. Refresh to continue",
       });
+      window.location.reload();
   
-        handleLogout();
+       //handleLogout();
     } catch (error) {
       console.error("Profile update error:", error);
       if(error.response?.data?.message === "Invalid Authorization header" || 
         error.response?.data?.message === "Invalid session" ||
          error.response?.data?.message === "Session required"){
-        handleLogout();
+       handleLogout();
       }
       setResponse({
         status: "error",
-        message: error.response?.data?.message || "Something went wrong. Please try again.",
+        message: error.response?.data?.message || "Something went wrong. Please refresh the page try again.",
       });
     } finally {
       setIsLoading(false);

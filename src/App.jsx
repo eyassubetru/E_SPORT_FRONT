@@ -16,7 +16,10 @@ import { Dot } from "lucide-react";
 import { db } from "./config/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import LoadingScreen from "./components/LoadingScreen";
-
+import { getOrCreateDeviceId } from "./utility/getOrCreateDeviceId";
+import axios from "axios";
+import { auth } from "./config/firebaseConfig";
+import { signOut } from "firebase/auth";
 
 
 const App = () => {
@@ -25,18 +28,62 @@ const App = () => {
   const { user, loading } = useAuth();
   const [hasAccount, setHasAccount] = useState(null);
   const [checkingProfile, setCheckingProfile] = useState(true);
+  const apiUrl = import.meta.env.VITE_API_URL;
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleCreateUserAccount = async (e) => {
+    try {
+      const token = await user?.accessToken;
+      const deviceId = getOrCreateDeviceId();
+      //console.log(deviceId, token);
+      await axios.post(`${apiUrl}/eStreamApi/setUserProfile`,
+        {
+          username: "",
+          email: " ",
+        },
+        {
+          headers: {
+            "x-device-id": deviceId,
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      );
+      window.location.reload();
+    } catch (error) {
+      console.error("Profile update error:", error);
+      if (error.response?.data?.message === "Invalid Authorization header" ||
+        error.response?.data?.message === "Invalid session" ||
+        error.response?.data?.message === "Session required") {
+        handleLogout();
+      }
+    }
+  };
 
   useEffect(() => {
     const checkUserProfile = async () => {
       if (loading || !user) return;
 
-      setCheckingProfile(true);
-
+      //setCheckingProfile(true);
+      //console.log(user);
       try {
         const userRef = doc(db, "stream_users", user.uid);
         const docSnap = await getDoc(userRef);
 
-        setHasAccount(docSnap.exists());
+        const exists = docSnap.exists();
+        setHasAccount(exists);
+
+        if (!exists) {
+          await handleCreateUserAccount();
+        }
+
       } catch (error) {
         console.error("Error checking user profile:", error);
         setHasAccount(false); // optional fallback
@@ -44,19 +91,13 @@ const App = () => {
         setCheckingProfile(false);
       }
     };
-
+    //console.log("loading=>", loading , "checkingProfile=>", checkingProfile)
     checkUserProfile();
   }, [loading, user]);
 
-  if (loading || checkingProfile) {
+  if (user && (loading || checkingProfile)) {
     return <LoadingScreen />
   }
-
-  if (user && hasAccount === false) {
-    return <CreateStreamUserAccount />;
-  }
-
-
 
   return (
 
@@ -98,11 +139,11 @@ const App = () => {
           </>
         } />
 
-        {/* <Route path="/payment" element={
+        <Route path="/payment" element={
           <>
             <PaymentPage />
           </>
-        } /> */}
+        } />
 
       </Route>
 

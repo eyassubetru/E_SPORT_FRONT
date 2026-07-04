@@ -1,0 +1,120 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    
+    match /events/{eventId} {
+    	allow read: if true;
+      
+      match /comments/{comentId} {
+      	allow read: if request.auth != null;
+      }
+    }
+    
+    match /competitors/{competitorsId} {
+    	allow read: if request.auth != null;
+    }
+    
+    match /categories/{categoriesId} {
+    	allow read: if request.auth != null;
+    }
+    
+    match /fans/{fanId} {
+    	allow read: if request.auth != null && request.auth.uid == fanId;
+      
+      match /nominis/{nominiId} {
+        allow read, delete: if request.auth != null && request.auth.uid == fanId;
+      }
+      
+      match /votes/{voteId} {
+        allow read, delete: if request.auth != null && request.auth.uid == fanId;
+      }
+      
+      match /category/{categoryId} {
+      	allow read, delete: if request.auth != null && request.auth.uid == categoryId;
+      }
+    }
+
+    match /transactions/{transactionId} {
+      allow read: if request.auth != null &&
+      firestore.get(/databases/(default)/documents/transactions/$(transactionId)).data.user_id == request.auth.uid;
+    }
+
+    match /receipt_users/{userId} {
+      allow read, update: if request.auth != null && request.auth.uid == userId;
+
+      match /receipts/{receiptId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+      }
+
+      match /bank_accounts/{accountId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+    
+    match /banks/{bankId} {
+    	allow read: if request.auth != null;
+      allow delete: if request.auth != null && (request.auth.uid == 'QvCRxlPX6lQnEme9j2Pb' || request.auth.uid == 'dH9fhFZ3Sur7uYUOC9cw');
+      
+      match /other_banks/{otherBankId} {
+      	allow read: if request.auth != null;
+      	allow delete: if request.auth != null && (request.auth.uid == 'QvCRxlPX6lQnEme9j2Pb' || request.auth.uid == 'dH9fhFZ3Sur7uYUOC9cw');
+      }
+      
+      match /receipt_verification_urls/{urlId} {
+      	allow read: if request.auth != null;
+      	allow delete: if request.auth != null && (request.auth.uid == 'QvCRxlPX6lQnEme9j2Pb' || request.auth.uid == 'dH9fhFZ3Sur7uYUOC9cw');
+      }
+    }
+    
+    match /receipt_users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      match /receipt_companies/{companyId} {
+      	allow read: if request.auth != null && (request.auth.uid == userId || request.auth.uid == companyId);
+      }
+
+      match /receipts/{receiptId} {
+      	allow read: if request.auth != null && (request.auth.uid == userId || request.auth.uid == companyId);
+			}
+    }
+
+     match /receipt_companies/{companyId} {
+      allow read: if request.auth != null &&
+        (exists(/databases/$(database)/documents/admins/$(request.auth.uid)) || request.auth.uid == companyId);
+
+      match /receipt_employees/{employeeId} {
+      	allow read: if request.auth != null && (request.auth.uid == companyId || request.auth.uid == employeeId ||
+        	exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+      }
+
+      match /receipts/{receiptId} {
+      	allow read: if request.auth != null &&
+        	(exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+          request.auth.uid == companyId ||
+          get(/databases/$(database)/documents/receipt_companies/$(companyId)/receipt_employees/$(request.auth.uid)).data.role == "admin" ||
+          get(/databases/$(database)/documents/receipt_companies/$(companyId)/receipt_employees/$(request.auth.uid)).data.role == "finance");
+			}
+    }
+
+    match /bank_accounts/{accountId} {
+      allow read, write: if request.auth != null && resource.data.company_id == request.auth.uid;
+    }
+    
+    match /stream_users/{streamUserId} {
+    	allow read, write: if request.auth != null && request.auth.uid == streamUserId;
+      
+      match /comments/{commentId} {
+      	allow read: if request.auth != null && request.auth.uid == streamUserId;
+      }
+      
+      match /notifications/{notificationId} {
+      	allow read: if request.auth != null && request.auth.uid == streamUserId;
+      }
+    }
+    
+    
+  }
+}

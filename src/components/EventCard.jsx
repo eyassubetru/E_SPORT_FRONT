@@ -42,17 +42,17 @@ const EventCard = ({ event }) => {
 
         <div className="grid grid-cols-2 gap-2 text-xs text-slate-300">
           {
-            event.dateTime && <div className="flex items-center gap-1.5">
+            event.start_date_time && <div className="flex items-center gap-1.5">
               <Calendar size={14} className="text-[#8bc2ff]" />
               <span>
-                {event.dateTime ? new Date(event.dateTime?.seconds * 1000).toLocaleString() : ""}
+                {event.start_date_time ? new Date(event.start_date_time?.seconds * 1000).toLocaleString() : ""}
               </span>
             </div>
           }
-          {event.prizePool > 0 &&
+          {event.prize_pool > 0 &&
             <div className="flex items-center gap-1.5">
               <Trophy size={14} className="text-[#f6e925]" />
-              <span>{event.prizePool}</span>
+              <span>{event.prize_pool}</span>
             </div>
           } 
         </div>

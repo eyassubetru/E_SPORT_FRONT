@@ -34,6 +34,7 @@ export const AuthProvider = ({ children }) => {
             accessToken: await firebaseUser.getIdToken(),
             ...userData,
           });
+           setLoading(false);
         } else {
           // 2. Clear user if they sign out
           setUser(null);

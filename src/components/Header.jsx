@@ -41,11 +41,11 @@ const Header = () => {
       {/* Branding */}
       <div className="flex flex-col leading-none min-w-0">
         <span className="truncate bg-gradient-to-r from-white to-slate-400 bg-clip-text text-[10px] sm:text-sm font-black uppercase tracking-[0.25em] text-transparent">
-          Ethiopia
+          Et
         </span>
 
         <span className="truncate text-[8px] sm:text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-          Event
+          Events
         </span>
       </div>
     </div>

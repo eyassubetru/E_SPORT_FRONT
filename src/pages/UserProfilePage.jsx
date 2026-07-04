@@ -76,7 +76,7 @@ const UserProfilePage = () => {
               </div>
 
               {/* Balance */}
-             {/*  <div className="mt-6 sm:mt-0 rounded-2xl border border-green-500/20 bg-green-500/10 p-4">
+              <div className="mt-6 sm:mt-0 rounded-2xl border border-green-500/20 bg-green-500/10 p-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-500/20 text-green-400">
                     <FaWallet />
@@ -87,11 +87,11 @@ const UserProfilePage = () => {
                       Balance
                     </p>
                     <h2 className="text-xl font-black text-green-400">
-                      ETB // {user.balance} 
+                      ETB {user.balance || "0.00"} 
                     </h2>
                   </div>
                 </div>
-              </div> */}
+              </div>
 
             </div>
 
