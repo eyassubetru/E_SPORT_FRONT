@@ -1,6 +1,9 @@
 import { Calendar, Trophy } from 'lucide-react'
 import { Link } from 'react-router'
 import { useAuth } from "../context/AuthContext";
+import { useEffect, useState } from 'react';
+
+
 
 
 const badgeClassByStatus = {
@@ -9,10 +12,16 @@ const badgeClassByStatus = {
   completed: 'bg-[#f6e925]/15 text-[#f6e925] border-[#f6e925]/50',
 }
 
+
 const EventCard = ({ event }) => {
   const isPay = false;
   const statusKey = event.status.toLowerCase()
   const { user, loading } = useAuth();
+  const [isUserSubscribe , setIsUserSubscribe] = useState(false);
+
+  const checkUserSubscription = async (eventId) => {
+    console.log(eventId);
+  }
 
   return (
     <article className="group rounded-md border border-[#2d3d63] bg-[#0c142b] p-3 shadow-xl shadow-black/20 transition-transform duration-300 hover:-translate-y-1">
@@ -57,7 +66,7 @@ const EventCard = ({ event }) => {
           } 
         </div>
 
-        <Link
+       {/*  <Link
           to={`/event/${event.id}`}
           className="block rounded-md bg-[#268dff] px-4 py-3 text-center text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-[#4da2ff]"
         >
@@ -65,7 +74,16 @@ const EventCard = ({ event }) => {
             'Watch'
           }
 
-        </Link>
+        </Link> */}
+        <button
+          onClick={() => checkUserSubscription(event.id)}
+          className="w-full block rounded-md bg-[#268dff] px-4 py-3 text-center text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-[#4da2ff]"
+        >
+          {
+            'Watch'
+          }
+
+        </button>
       </div>
     </article>
   )

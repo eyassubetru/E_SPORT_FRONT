@@ -95,6 +95,7 @@ const Events = () => {
       }));
 
       setEvents(eventsList);
+      console.log(eventsList);
       const featured = eventsList.find((item) => item.featured) ?? eventsList[0]
       setFeaturedEvent(featured);
 
