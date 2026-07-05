@@ -23,7 +23,7 @@ const EventCard = ({ event }) => {
   const [isUserSubscribe, setIsUserSubscribe] = useState(false);
   const [isSubscriptionLoading, setIsSubscriptionLoading] = useState(false);
   const apiUrl = import.meta.env.VITE_API_URL;
-  const token = user.accessToken;
+  const token = user?.accessToken;
   const navigate = useNavigate()
 
   /*  const checkUserSubscription = async () => {
@@ -68,65 +68,225 @@ const EventCard = ({ event }) => {
        setIsSubscriptionLoading(false);
      }
    }; */
-  const chapaUrl = async () => {
+  /*  const chapaUrl = async () => {
+ 
+     const payload = {
+       currency: "ETB",
+       email: user?.email,
+       first_name:
+         user?.displayName?.split(" ")[0] || "",
+       last_name:
+         user?.displayName
+           ?.split(" ")
+           .slice(1)
+           .join(" ")|| " ",
+       phone_number:user?.phoneNumber,
+       return_url:
+         "https://etstream.app/event"
+     };
+     try {
+       const res = await axios.post(
+         `${apiUrl}/eStreamApi/createChapaDeposit`,
+         payload,
+         {
+           headers: {
+             Authorization: `Bearer ${token}`,
+             "Content-Type": "application/json",
+           },
+           withCredentials: true,
+         }
+       );
+ 
+       console.log(res.data);
+     } catch (error) {
+       console.error(
+         error.response?.data || error.message
+       );
+     }
+   } */
 
-    const payload = {
-      return_url:"https://etstream.app/event",
-      currency:"ETB",
-      email:"eyassuBetru@gmail.com",
-      phone:"0931260592"
-
-    }
-    try {
-      const res = await axios.post(
-        `${apiUrl}/eStreamApi/createChapaDeposit`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
-
-      console.log(res.data);
-    } catch (error) {
-      console.error(
-        error.response?.data || error.message
-      );
-    }
+ const chapaUrl = async (eventId) => {
+  if (!user) {
+    navigate("/login");
+    return;
   }
 
-  const checkUserSubscription = async (eventId) => {
-    setIsSubscriptionLoading(true);
-    try {
-      const userRef = doc(db, "stream_users", user.uid);
-      const userSnap = await getDoc(userRef);
+  try {
+    const token = await user?.accessToken;
+    const localPhone = user.phoneNumber
+      ? user.phoneNumber.replace("+251", "0")
+      : "";
 
-      if (!userSnap.exists()) {
-        console.log("User not found");
-        return;
-      }
+    const payload = {
+      currency: "ETB",
+      email: user.email || "",
+      first_name:
+        user.displayName?.split(" ")[0] || "",
 
-      const dbUser = {
-        id: userSnap.id,
-        ...userSnap.data(),
-      };
-      console.log(dbUser.is_paid);
-      if (dbUser.is_paid) {
-        navigate(`/event/${eventId}`);
-      } else {
-        await chapaUrl();
-        //navigate(`/payment/${eventId}`);
+      last_name:
+        user.displayName
+          ?.split(" ")
+          .slice(1)
+          .join(" ") || "",
+
+      phone_number: localPhone,
+
+      return_url: `${window.location.origin}/event/${eventId}`,
+    };
+
+    const { data } = await axios.post(
+      `${apiUrl}/eStreamApi/createChapaDeposit`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }
       }
-      console.log(dbUser);
-    } catch (error) {
-      console.log(error);
-    }finally{
-      setIsSubscriptionLoading(false)
+    );
+
+    console.log(data);
+
+    // Save tx reference
+    if (data.txRef) {
+      localStorage.setItem(
+        "pendingChapaTxRef",
+        data.txRef
+      );
     }
+
+    // Redirect user to Chapa
+    if (data.checkoutUrl) {
+      window.location.href =
+        data.checkoutUrl;
+
+      return;
+    }
+
+  } catch (error) {
+    console.error(
+      error?.response?.data ||
+      error.message
+    );
+  }
+};
+
+
+const checkUserSubscription = async (
+  eventId
+) => {
+
+  if (!user) {
+    navigate("/login");
+    return;
+  }
+
+  setIsSubscriptionLoading(true);
+
+  try {
+
+    const userRef = doc(
+      db,
+      "stream_users",
+      user.uid
+    );
+
+    const userSnap =
+      await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+
+      await chapaUrl(eventId);
+      return;
+    }
+
+    const dbUser =
+      userSnap.data();
+
+    if (dbUser?.is_paid) {
+
+      navigate(`/event/${eventId}`);
+
+    } else {
+
+      await chapaUrl(eventId);
+
+    }
+
+  } catch (error) {
+
+    console.error(error);
+
+  } finally {
+
+    setIsSubscriptionLoading(false);
+
+  }
+};
+
+
+useEffect(() => {
+
+  const verifyPayment = async () => {
+
+    if (!user) return;
+
+    const txRef =
+      localStorage.getItem(
+        "pendingChapaTxRef"
+      );
+
+    if (!txRef) return;
+
+    try {
+
+      const token =
+        await user.getIdToken();
+
+      const { data } =
+        await axios.post(
+          `${apiUrl}/eStreamApi/verifyChapaDeposit`,
+          {
+            txRef
+          },
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`,
+              "Content-Type":
+                "application/json"
+            }
+          }
+        );
+
+      console.log(data);
+
+      if (data.validated) {
+
+        localStorage.removeItem(
+          "pendingChapaTxRef"
+        );
+
+        // navigate after success if needed
+        // navigate(`/event/${eventId}`);
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        error?.response?.data ||
+        error.message
+      );
+
+    }
+
   };
+
+  verifyPayment();
+
+}, [user]);
+
   return (
     <article className="group rounded-md border border-[#2d3d63] bg-[#0c142b] p-3 shadow-xl shadow-black/20 transition-transform duration-300 hover:-translate-y-1">
       <div className="relative h-44 overflow-hidden rounded-sm">
@@ -169,7 +329,16 @@ const EventCard = ({ event }) => {
             </div>
           }
         </div>
-        {
+        <Link
+              to={`/event/${event.id}`}
+              className="block rounded-md bg-[#268dff] px-4 py-3 text-center text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-[#4da2ff]"
+            >
+              {
+                'Watch'
+              }
+
+            </Link>
+       {/*  {
           event?.status === "completed" ?
             <Link
               to={`/event/${event.id}`}
@@ -193,7 +362,7 @@ const EventCard = ({ event }) => {
               }
 
             </button>
-        }
+        } */}
 
       </div>
     </article>

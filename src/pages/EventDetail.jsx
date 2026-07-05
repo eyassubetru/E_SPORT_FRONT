@@ -107,7 +107,7 @@ const EventDetail = () => {
     fetchEvents();
   }, [id]);
 
-  useEffect(() => {
+ /*  useEffect(() => {
   if (loading || !event || !user) return;
 
   if (
@@ -116,7 +116,7 @@ const EventDetail = () => {
   ) {
     checkUserSubscription(id);
   }
-}, [event, loading, user, id]);
+}, [event, loading, user, id]); */
   if (isLoading || isSubscriptionLoading) {
     return <LoadingScreen />;
   }
@@ -127,7 +127,7 @@ const EventDetail = () => {
         <AlertCircle className="text-red-400" size={32} />
         <p>{error}</p>
         <Link
-          to="/event"
+          to="/"
           className="text-sm text-cyan-400 hover:text-cyan-300 underline underline-offset-4"
         >
           Back to Events
@@ -207,7 +207,7 @@ const EventDetail = () => {
         <div className="flex items-center justify-between">
           <Link
             className="group text-sm text-slate-300 hover:text-cyan-400 transition-all duration-200 flex items-center gap-2 bg-white/5 hover:bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm"
-            to={"/event"}
+            to={"/"}
           >
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
             <span className="hidden sm:inline font-medium">Back to Events</span>
