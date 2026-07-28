@@ -103,7 +103,7 @@ const App = () => {
 
     <Routes location={location} key={location.pathname}>
 
-      {/* <Route path="/" element={
+      <Route path="/" element={
         <>
           <LoginForm />
         </>
@@ -118,10 +118,10 @@ const App = () => {
         <>
           < ForgottenPassword />
         </>
-      } /> */}
+      } />
 
-     {/*  <Route element={<ProtectedRoute />}> */}
-        <Route path="/" element={
+      <Route element={<ProtectedRoute />}>
+        <Route path="/event" element={
           <>
             <Events />
           </>
@@ -145,7 +145,7 @@ const App = () => {
           </>
         } />
 
-    {/*   </Route> */}
+      </Route>
 
     </Routes>
 
